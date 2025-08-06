@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="StoredProcedure" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Update the latest log sequence number for each table
+
+]]></Comments>
+  <Parameters>
+    <Parameter Name="LastTemperatureReadingLsn" Type="binary(10)" Output="False" DefaultValue="null" Comments="" />
+    <Parameter Name="LastMoistureReadingLsn" Type="binary(10)" Output="False" DefaultValue="null" Comments="" />
+    <Parameter Name="LastSoilReadingLsn" Type="binary(10)" Output="False" DefaultValue="null" Comments="" />
+    <Parameter Name="LastStatusLsn" Type="binary(10)" Output="False" DefaultValue="null" Comments="" />
+  </Parameters>
+  <Code><![CDATA[
+
+update
+  [dbo].[HistoryState]
+set
+  LastTemperatureReadingLsn = isnull(@LastTemperatureReadingLsn, LastTemperatureReadingLsn)
+  ,LastMoistureReadingLsn = isnull(@LastMoistureReadingLsn, LastMoistureReadingLsn)
+  ,LastSoilReadingLsn = isnull(@LastSoilReadingLsn, LastSoilReadingLsn)
+  ,LastStatusLsn = isnull(@LastStatusLsn, LastStatusLsn)
+where
+  HistoryStateId = 1
+;
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>

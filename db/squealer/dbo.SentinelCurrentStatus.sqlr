@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="ScalarFunction" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the output of this scalar function and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Get the current status of a sentinel
+
+]]></Comments>
+  <Parameters>
+    <Parameter Name="SentinelId" Type="varchar(50)" DefaultValue="" Comments="" />
+  </Parameters>
+  <!-- Define the data type For @Result, your scalar Return variable. -->
+  <Returns Type="int" />
+  <Code><![CDATA[
+
+select top 1
+  @Result = ssh.SentinelStatusCode
+from
+  [dbo].[SentinelStatusHistory] ssh
+where
+  ssh.SentinelId = @SentinelId
+order by
+  ssh.SavedDate desc
+;
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>

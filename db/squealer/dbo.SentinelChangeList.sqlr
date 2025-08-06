@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="StoredProcedure" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Get the cdc changes from the Sentinel table
+
+]]></Comments>
+  <Parameters>
+    <!--<Parameter Name="MyParameter" Type="varchar(50)" Output="False" DefaultValue="" Comments="" />-->
+  </Parameters>
+  <Code><![CDATA[
+
+declare @from_lsn binary(10) = sys.fn_cdc_get_min_lsn('dbo_Sentinel');
+declare @to_lsn binary(10) = sys.fn_cdc_get_max_lsn();
+
+select
+  __$operation as [Operation]
+  ,PositionX
+  ,PositionY
+  ,SavedDate
+from
+  cdc.fn_cdc_get_all_changes_dbo_Sentinel(@from_lsn, @to_lsn, N'all update old')
+;
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>

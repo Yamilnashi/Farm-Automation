@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="StoredProcedure" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Insert a new moisture reading in the history table
+
+]]></Comments>
+  <Parameters>
+    <Parameter Name="MoistureReadingHistoryId" Type="int" Output="True" DefaultValue="" Comments="" />
+    <Parameter Name="SentinelId" Type="int" Output="False" DefaultValue="" Comments="" />
+    <Parameter Name="Moisture" Type="tinyint" Output="False" DefaultValue="" Comments="" />
+  </Parameters>
+  <Code><![CDATA[
+
+insert
+  [dbo].[MoistureReadingHistory]
+(
+  SentinelId
+  ,Moisture
+  ,SavedDate
+)
+values
+(
+  @SentinelId
+  ,@Moisture
+  ,sysdatetime()
+);
+
+set @MoistureReadingHistoryId = scope_identity();
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>
