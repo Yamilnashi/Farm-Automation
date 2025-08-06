@@ -23,6 +23,7 @@ declare @to_lsn binary(10) = sys.fn_cdc_get_max_lsn();
 
 select
   __$operation as [Operation]
+  ,Sentinelid
   ,PositionX
   ,PositionY
   ,SavedDate

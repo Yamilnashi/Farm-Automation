@@ -19,13 +19,13 @@ stages:
             displayName: 'Restore NuGet packages'
             inputs:
                 command: 'restore'
-                projects: 'CropMonitoringEDA.sln' 
+                projects: 'FarmToTableEDA.sln' 
 
         -   task: DotNetCoreCLI@2
             displayName: 'Build Solution'
             inputs:
                 command: 'build'
-                projects: 'CropMonitoringEDA.sln'
+                projects: 'FarmToTableEDA.sln'
                 arguments: '--configuration $(buildConfiguration)' 
 
         -   task: DotNetCoreCLI@2
