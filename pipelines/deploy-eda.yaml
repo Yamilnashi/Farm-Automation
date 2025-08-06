@@ -1,0 +1,70 @@
+trigger:
+    branches:
+        include:
+        - main 
+
+pool:
+    name: 'Default'
+
+variables:
+    functionAppName: 'CropFunctions'
+    buildConfiguration: 'Release'
+
+stages:
+-   stage: BuildAndDeploy
+    jobs:
+    -   job: BuildAndDeployJob # single job so we dont reach the parallel limit in azure
+        steps:
+        -   task: DotNetCoreCLI@2
+            displayName: 'Restore NuGet packages'
+            inputs:
+                command: 'restore'
+                projects: 'CropMonitoringEDA.sln' 
+
+        -   task: DotNetCoreCLI@2
+            displayName: 'Build Solution'
+            inputs:
+                command: 'build'
+                projects: 'CropMonitoringEDA.sln'
+                arguments: '--configuration $(buildConfiguration)' 
+
+        -   task: DotNetCoreCLI@2
+            displayName: 'Run Unit Tests'
+            inputs:
+                command: 'test'
+                projects: '**/CropTests.csproj'
+                arguments: '--configuration $(buildConfiguration)'
+
+        -   task: DotNetCoreCLI@2
+            displayName: 'Publish Functions project'
+            inputs: 
+                command: 'publish'
+                publishWebProjects: false
+                projects: '**/CropSubscribers.csproj' 
+                arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish_output'
+                zipAfterPublish: true 
+
+        -   task: AzureFunctionApp@1
+            displayName: 'Deploy to Azure Function App'
+            inputs:
+                azureSubscription: 'AzureCropConnection' 
+                appType: 'functionApp'
+                appName: '$(functionAppName)'
+                package: '$(Build.ArtifactStagingDirectory)/publish_output/*.zip' 
+
+        -   task: DotNetCoreCLI@2
+            displayName: 'Publish Publisher project'
+            inputs:
+                command: 'publish'
+                publishWebProjects: false
+                projects: '**/CropPublisher.csproj'
+                arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publisher_output'
+                zipAfterPublish: true
+
+        -   task: AzureWebApp@1
+            displayName: 'webApp'
+            inputs:
+                azureSubscription: 'AzureCropConnection'
+                appType: 'webApp'
+                appName: 'CropPublisherApp'
+                package: '$(Build.ArtifactStagingDirectory)/publisher_output/*.zip'
