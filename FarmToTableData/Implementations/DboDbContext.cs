@@ -2,7 +2,6 @@
 using FarmToTableData.Interfaces;
 using FarmToTableData.Models;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,17 +9,15 @@ using System.Threading.Tasks;
 
 namespace FarmToTableData.Implementations
 {
-    public class DboDbContext : IAsyncDisposable, IDisposable, IDboDbContextRead, IDboDbContextWrite
+    public class DboDbContext : IDisposable, IDboDbContextRead, IDboDbContextWrite
     {
         #region Fields
-        private readonly ILogger<DboDbContext> _logger;
         private readonly SqlConnection _connection;
         #endregion
 
         #region Constructor
-        public DboDbContext(ILogger<DboDbContext> logger, string connectionString)
+        public DboDbContext(string connectionString)
         {
-            _logger = logger;
             _connection = new SqlConnection(connectionString);
             _connection.OpenAsync().GetAwaiter().GetResult();
         }
@@ -30,10 +27,6 @@ namespace FarmToTableData.Implementations
         public void Dispose()
         {
             _connection.Dispose();
-        }
-        public async ValueTask DisposeAsync()
-        {
-            await DisposeAsync();
         }
 
         public Task<HistoryState> HistoryStateGet()
@@ -45,10 +38,11 @@ namespace FarmToTableData.Implementations
         public Task HistoryStateUpdate(byte[] lastTemperatureReadingLsn = null,
             byte[] lastMoistureReadingLsn = null,
             byte[] lastSoilReadingLsn = null,
-            byte[] lastStatusLsn = null)
+            byte[] lastStatusLsn = null,
+            byte[] lastSentinelLsn = null)
         {
             string sql = "[dbo].[HistoryStateUpdate]";
-            var values = new { lastTemperatureReadingLsn, lastMoistureReadingLsn, lastSoilReadingLsn, lastStatusLsn };
+            var values = new { lastTemperatureReadingLsn, lastMoistureReadingLsn, lastSoilReadingLsn, lastStatusLsn, lastSentinelLsn };
             return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
         }
 
@@ -63,10 +57,11 @@ namespace FarmToTableData.Implementations
             return Task.Run(() => p.Get<int>("MoistureReadingHistoryId"));
         }
 
-        public Task<IEnumerable<MoistureReadingHistoryChange>> MoistureReadingHistoryChangeList()
+        public Task<IEnumerable<MoistureReadingHistoryChange>> MoistureReadingHistoryChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {
             string sql = "[dbo].[MoistureReadingHistoryChangeList]";
-            return _connection.QueryAsync<MoistureReadingHistoryChange>(sql, commandType: CommandType.StoredProcedure);
+            var values = new { fromLogSequenceNumber, toLogSequenceNumber };
+            return _connection.QueryAsync<MoistureReadingHistoryChange>(sql, values, commandType: CommandType.StoredProcedure);
         }
 
         public Task ResetSentinel()
@@ -86,10 +81,11 @@ namespace FarmToTableData.Implementations
             return Task.Run(() => p.Get<int>("SentinelId"));
         }
 
-        public Task<IEnumerable<SentinelChange>> SentinelChangeList()
+        public Task<IEnumerable<SentinelChange>> SentinelChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {
             string sql = "[dbo].[SentinelChangeList]";
-            return _connection.QueryAsync<SentinelChange>(sql, commandType: CommandType.StoredProcedure);
+            var values = new { fromLogSequenceNumber, toLogSequenceNumber };
+            return _connection.QueryAsync<SentinelChange>(sql, values, commandType: CommandType.StoredProcedure);
         }
 
         public Task<IEnumerable<Sentinel>> SentinelList()
@@ -115,10 +111,11 @@ namespace FarmToTableData.Implementations
             return Task.Run(() => p.Get<int>("SentinelStatusHistoryId"));
         }
 
-        public Task<IEnumerable<SentinelStatusHistoryChange>> SentinelStatusHistoryChangeList()
+        public Task<IEnumerable<SentinelStatusHistoryChange>> SentinelStatusHistoryChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {
             string sql = "[dbo].[SentinelStatusHistoryChangeList]";
-            return _connection.QueryAsync<SentinelStatusHistoryChange>(sql, commandType: CommandType.StoredProcedure);
+            var values = new { fromLogSequenceNumber, toLogSequenceNumber };
+            return _connection.QueryAsync<SentinelStatusHistoryChange>(sql, values, commandType: CommandType.StoredProcedure);
         }
 
         public Task<int> SoilReadingHistoryAdd(int sentinelId, int nPpm, int pPpm, int kPpm)
@@ -134,10 +131,11 @@ namespace FarmToTableData.Implementations
             return Task.Run(() => p.Get<int>("SoilReadingHistoryId"));
         }
 
-        public Task<IEnumerable<SoilReadingHistoryChange>> SoilReadingHistoryChangeList()
+        public Task<IEnumerable<SoilReadingHistoryChange>> SoilReadingHistoryChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {
-            string sql = "[dbo].[SoilReadingHistoryChaangeList]";
-            return _connection.QueryAsync<SoilReadingHistoryChange>(sql, commandType: CommandType.StoredProcedure);
+            string sql = "[dbo].[SoilReadingHistoryChangeList]";
+            var values = new { fromLogSequenceNumber, toLogSequenceNumber };
+            return _connection.QueryAsync<SoilReadingHistoryChange>(sql, values, commandType: CommandType.StoredProcedure);
         }
 
         public Task<int> TemperatureReadingHistoryAdd(int sentinelId, decimal temperatureCelsius)
@@ -151,10 +149,37 @@ namespace FarmToTableData.Implementations
             return Task.Run(() => p.Get<int>("TemperatureReadingHistoryId"));
         }
 
-        public Task<IEnumerable<TemperatureReadingHistoryChange>> TemperatureReadingHistoryChangeList()
+        public Task<IEnumerable<TemperatureReadingHistoryChange>> TemperatureReadingHistoryChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {
             string sql = "[dbo].[TemperatureReadingHistoryChangeList]";
-            return _connection.QueryAsync<TemperatureReadingHistoryChange>(sql, commandType: CommandType.StoredProcedure);
+            var values = new { fromLogSequenceNumber, toLogSequenceNumber };
+            return _connection.QueryAsync<TemperatureReadingHistoryChange>(sql, values, commandType: CommandType.StoredProcedure);
+        }
+
+        public Task<byte[]> CdcMaxLogSequenceNumberGet()
+        {
+            string sql = "select sys.fn_cdc_get_max_lsn()";
+            return _connection.ExecuteScalarAsync<byte[]>(sql, commandType: CommandType.Text);
+        }
+
+        public Task<byte[]> CdcMinLogSequenceNumberGet(string tableName)
+        {
+            string sql = "select sys.fn_cdc_get_min_lsn(@tableName)";
+            var values = new { tableName };
+            return _connection.ExecuteScalarAsync<byte[]>(sql, values, commandType: CommandType.Text);
+        }
+
+        public Task<byte[]> CdcMaxLogSequenceNumberGetPerTable(string tableName)
+        {
+            string sql = $"select max(__$start_lsn) from cdc.[{tableName}_CT]";
+            return _connection.ExecuteScalarAsync<byte[]>(sql, commandType: CommandType.Text);
+        }
+
+        public Task<byte[]> CdcIncrementLastLogSequenceNumberGet(byte[] lastLogSequenceNumber)
+        {
+            string sql = "select sys.fn_cdc_increment_lsn(@lastLogSequenceNumber)";
+            var values = new { lastLogSequenceNumber };
+            return _connection.ExecuteScalarAsync<byte[]>(sql, values, commandType: CommandType.Text);
         }
         #endregion
 

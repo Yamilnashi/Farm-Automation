@@ -8,7 +8,8 @@ namespace FarmToTableData.Interfaces
         Task HistoryStateUpdate(byte[] lastTemperatureReadingLsn = null, 
             byte[] lastMoistureReadingLsn = null, 
             byte[] lastSoilReadingLsn = null, 
-            byte[] lastStatusLsn = null);
+            byte[] lastStatusLsn = null,
+            byte[] lastSentinelLsn = null);
         Task<int> MoistureReadingHistoryAdd(int sentinelId, byte moisture);
         Task<int> TemperatureReadingHistoryAdd(int sentinelId, decimal temperatureCelsius);
         Task<int> SoilReadingHistoryAdd(int sentinelId, int nPpm, int pPpm, int kPpm);

@@ -1,6 +1,4 @@
-﻿using FarmToTableData.Models;
-
-namespace FarmToTableData.Interfaces
+﻿namespace FarmToTableData.Models
 {
     public class TemperatureReadingHistoryChange : HistoryChangeBase
     {

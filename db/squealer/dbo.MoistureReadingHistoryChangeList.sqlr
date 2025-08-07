@@ -14,12 +14,10 @@ Get the cdc changes from the MoistureReadingHistory table
 
 ]]></Comments>
   <Parameters>
-    <!--<Parameter Name="MyParameter" Type="varchar(50)" Output="False" DefaultValue="" Comments="" />-->
+    <Parameter Name="FromLogSequenceNumber" Type="binary(10)" Output="False" DefaultValue="" Comments="" />
+    <Parameter Name="ToLogSequenceNumber" Type="binary(10)" Output="False" DefaultValue="" Comments="" />
   </Parameters>
   <Code><![CDATA[
-
-declare @from_lsn binary(10) = sys.fn_cdc_get_min_lsn('dbo_MoistureReadingHistory');
-declare @to_lsn binary(10) = sys.fn_cdc_get_max_lsn();
 
 select
   __$operation as [Operation]
@@ -28,7 +26,7 @@ select
   ,Moisture
   ,SavedDate
 from
-  cdc.fn_cdc_get_all_changes_dbo_MoistureReadingHistory(@from_lsn, @to_lsn, N'all update old')
+  cdc.fn_cdc_get_all_changes_dbo_MoistureReadingHistory(@FromLogSequenceNumber, @ToLogSequenceNumber, N'all update old')
 ;
 
 ]]></Code>

@@ -18,6 +18,7 @@ Update the latest log sequence number for each table
     <Parameter Name="LastMoistureReadingLsn" Type="binary(10)" Output="False" DefaultValue="null" Comments="" />
     <Parameter Name="LastSoilReadingLsn" Type="binary(10)" Output="False" DefaultValue="null" Comments="" />
     <Parameter Name="LastStatusLsn" Type="binary(10)" Output="False" DefaultValue="null" Comments="" />
+    <Parameter Name="LastSentinelLsn" Type="binary(10)" Output="False" DefaultValue="null" Comments="" />
   </Parameters>
   <Code><![CDATA[
 
@@ -28,6 +29,7 @@ set
   ,LastMoistureReadingLsn = isnull(@LastMoistureReadingLsn, LastMoistureReadingLsn)
   ,LastSoilReadingLsn = isnull(@LastSoilReadingLsn, LastSoilReadingLsn)
   ,LastStatusLsn = isnull(@LastStatusLsn, LastStatusLsn)
+  ,LastSentinelLsn = isnull(@LastSentinelLsn, LastSentinelLsn)
 where
   HistoryStateId = 1
 ;

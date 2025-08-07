@@ -18,6 +18,19 @@ Reset all columns
   </Parameters>
   <Code><![CDATA[
 
+update
+  [dbo].[HistoryState]
+set
+  LastTemperatureReadingLsn = null
+  ,LastMoistureReadingLsn = null
+  ,LastSoilReadingLsn = null
+  ,LastStatusLsn = null
+  ,LastSentinelLsn = null
+where
+  HistoryStateId = 1
+;
+
+
 delete [dbo].[TemperatureReadingHistory];
 delete [dbo].[MoistureReadingHistory];
 delete [dbo].[SoilReadingHistory];

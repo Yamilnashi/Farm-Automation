@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyVaultAccessLib", "KeyVau
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmToTableData", "FarmToTableData\FarmToTableData.csproj", "{10DE4C72-DD52-43D0-8FDC-50AAC4CBDFA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmToTablePublisher", "FarmToTablePublisher\FarmToTablePublisher.csproj", "{FCAF0DB7-F436-45A2-8799-9836D32595BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{10DE4C72-DD52-43D0-8FDC-50AAC4CBDFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10DE4C72-DD52-43D0-8FDC-50AAC4CBDFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10DE4C72-DD52-43D0-8FDC-50AAC4CBDFA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCAF0DB7-F436-45A2-8799-9836D32595BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCAF0DB7-F436-45A2-8799-9836D32595BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCAF0DB7-F436-45A2-8799-9836D32595BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCAF0DB7-F436-45A2-8799-9836D32595BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
