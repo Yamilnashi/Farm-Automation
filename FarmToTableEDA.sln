@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmToTableData", "FarmToTa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmToTablePublisher", "FarmToTablePublisher\FarmToTablePublisher.csproj", "{FCAF0DB7-F436-45A2-8799-9836D32595BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmToTableSubscribers", "FarmToTableSubscribers\FarmToTableSubscribers.csproj", "{3B504A40-6674-49AA-8EBC-77EABD3EEC8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmToTableWebApp", "FarmToTableWebApp\FarmToTableWebApp.csproj", "{BC03FDCD-2E1C-419F-AE6B-D29324A9CEB1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{FCAF0DB7-F436-45A2-8799-9836D32595BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCAF0DB7-F436-45A2-8799-9836D32595BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCAF0DB7-F436-45A2-8799-9836D32595BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B504A40-6674-49AA-8EBC-77EABD3EEC8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B504A40-6674-49AA-8EBC-77EABD3EEC8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B504A40-6674-49AA-8EBC-77EABD3EEC8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B504A40-6674-49AA-8EBC-77EABD3EEC8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC03FDCD-2E1C-419F-AE6B-D29324A9CEB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC03FDCD-2E1C-419F-AE6B-D29324A9CEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC03FDCD-2E1C-419F-AE6B-D29324A9CEB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC03FDCD-2E1C-419F-AE6B-D29324A9CEB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

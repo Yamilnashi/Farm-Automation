@@ -1,0 +1,17 @@
+{
+  "version": "2.0",
+  "extensions": {
+    "durableTask": {
+      "hubName": "FarmToTableHub"
+    }
+  },
+    "logging": {
+        "applicationInsights": {
+            "samplingSettings": {
+                "isEnabled": true,
+                "excludedTypes": "Request"
+            },
+            "enableLiveMetricsFilters": true
+        }
+    }
+}
