@@ -25,7 +25,7 @@ jobs:
         run: dotnet build FarmToTableEDA.sln --configuration Release
 
       - name: Run Unit Tests
-        run: dotnet test **/CropTests.csproj --configuration Release 
+        run: dotnet test **/FarmToTableTests.csproj --configuration Release 
 
       - name: Publish Functions project (Subscribers)
         run: dotnet publish FarmToTableSubscribers.csproj --configuration Release --output ./publish_output_functions  

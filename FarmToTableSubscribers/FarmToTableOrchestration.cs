@@ -1,15 +1,12 @@
-using System;
-using System.Net.NetworkInformation;
-using System.Text.Json;
 using Azure.Messaging.EventHubs;
 using FarmToTableData.Extensions;
 using FarmToTableData.Models;
 using FarmToTableSubscribers.Implementations;
-using FarmToTableSubscribers.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace FarmToTableSubscribers;
 public static class FarmToTableOrchestration
