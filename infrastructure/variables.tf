@@ -28,9 +28,9 @@ variable "function_app_name" {
 	default = "FarmToTableFunctions"
 }
 
-variable "publisher_plan_name" {
+variable "web_app_plan_name" {
 	type = string
-	default = "farmtt-publisher-plan"
+	default = "farmtotable-publisher-plan"
 }
 
 variable "web_app_name" {
@@ -53,4 +53,10 @@ variable "sql_password" {
 	type = string
 	sensitive = true
 	description = "SQL Server password"
+}
+
+variable "eventhub_connection_string" {
+	type = string
+	sensitive = true
+	description = "Event Hub Connection String"
 }

@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /infrastructure/.terraform.lock.hcl
 /infrastructure/plan.tfplan
 /infrastructure/terraform.tfstate
+/infrastructure/terraform.tfstate.backup

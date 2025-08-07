@@ -51,23 +51,30 @@ resource "azurerm_windows_function_app" "functions" {
 	site_config {}
 }
 
-resource "azurerm_service_plan" "publisher_plan" {
-	name = var.publisher_plan_name
+resource "azurerm_service_plan" "web_plan" {
+	name = var.web_app_plan_name
 	location = azurerm_resource_group.rg.location
 	resource_group_name = azurerm_resource_group.rg.name
 	os_type = "Windows"
 	sku_name = "B1"
 }
 
-resource "azurerm_windows_web_app" "publisher_app" {
+resource "azurerm_windows_web_app" "web_app" {
 	name = var.web_app_name
 	location = azurerm_resource_group.rg.location
 	resource_group_name = azurerm_resource_group.rg.name
-	service_plan_id = azurerm_service_plan.publisher_plan.id
+	service_plan_id = azurerm_service_plan.web_plan.id
+	https_only = true
 	site_config {
 		application_stack {
-		dotnet_version = "v8.0"
+			current_stack = "dotnet"
+			dotnet_version = "v8.0"
 		}
+	}
+
+	app_settings = {
+		"EventHubConnectionString" = var.eventhub_connection_string
+		"WEBSITE_RUN_FROM_PACKAGE" = 1
 	}
 }
 
