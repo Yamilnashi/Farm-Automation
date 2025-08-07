@@ -1,11 +1,12 @@
 ﻿using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Producer;
 using FarmToTableData.Implementations;
+using FarmToTableData.Models;
 using System.Text.Json;
 
 namespace FarmToTablePublisher.Data
 {
-    public abstract class ProducerClientBase<T> : IAsyncDisposable where T : class
+    public abstract class ProducerClientBase<T> : IAsyncDisposable where T : ChangeBase
     {
         #region Fields
         protected abstract string TableName { get; }
@@ -17,11 +18,10 @@ namespace FarmToTablePublisher.Data
         #endregion
 
         #region Constructor
-        public ProducerClientBase(string connectionString, 
-            string eventHubConnectionString, string eventHubName)
+        public ProducerClientBase()
         {            
-            _dbContext = new DboDbContext(connectionString);
-            _producerClient = new EventHubProducerClient(eventHubConnectionString, eventHubName);
+            _dbContext = new DboDbContext(Program.DbConnectionString);
+            _producerClient = new EventHubProducerClient(Program.EventHubConnectionString, Program.EventHubName);
             _eventBatch = null;
             _instance = this;
         }
@@ -34,6 +34,31 @@ namespace FarmToTablePublisher.Data
         #endregion
 
         #region Methods
+        public void PrintChangeStatistics(T[] changes)
+        {
+            int deleteCount = 0;
+            int insertCount = 0;
+            int updateCount = 0;
+            for (int i = 0; i < changes.Length; i++)
+            {
+                if (changes[i].Operation == ECdcChangeType.Delete)
+                {
+                    deleteCount++;
+                }
+                else if (changes[i].Operation == ECdcChangeType.Insert)
+                {
+                    insertCount++;
+                }
+                else if (changes[i].Operation == ECdcChangeType.UpdateAfter)
+                {
+                    updateCount++;
+                } else
+                {
+                    Console.WriteLine($"Unknown Operation: {changes[i]}");
+                }
+            }
+            
+        }
         public Task<byte[]?> GetCdcMaxLogSequenceNumberPerTable()
         {
             return _dbContext.CdcMaxLogSequenceNumberGetPerTable(TableName);
@@ -68,11 +93,33 @@ namespace FarmToTablePublisher.Data
                 return; // no new changes
             }
 
-            IEnumerable<T> changeList = await GetCdcChangeList(fromLogSequenceNumber, maxLogSequenceNumber);
+            IEnumerable<T> changeList = await GetCdcChangeList(fromLogSequenceNumber, maxLogSequenceNumber);            
             T[] changes = changeList.ToArray();
+
+            int deleteCount = 0;
+            int insertCount = 0;
+            int updateCount = 0;
+
             for (int i = 0; i < changes.Length; i++)
             {
                 T change = changes[i];
+                if (change.Operation == ECdcChangeType.Delete)
+                {
+                    deleteCount++;
+                }
+                else if (change.Operation == ECdcChangeType.Insert)
+                {
+                    insertCount++;
+                }
+                else if (change.Operation == ECdcChangeType.UpdateAfter)
+                {
+                    updateCount++;
+                }
+                else
+                {
+                    Console.WriteLine($"Unknown Operation: {changes[i]}");
+                }
+
                 byte[] eventDataBytes = JsonSerializer.SerializeToUtf8Bytes(change);
                 EventData eventData = new EventData(eventDataBytes);
                 if (_eventBatch != null &&
@@ -80,6 +127,11 @@ namespace FarmToTablePublisher.Data
                 {
                     await HistoryStateUpdate(maxLogSequenceNumber);
                 }
+            }
+
+            if (deleteCount + insertCount + updateCount > 0)
+            {
+                Console.WriteLine($"{EventName} | Deleted: {deleteCount}, New: {insertCount}, Update: {updateCount}");
             }
 
             await SendBatchAsync();

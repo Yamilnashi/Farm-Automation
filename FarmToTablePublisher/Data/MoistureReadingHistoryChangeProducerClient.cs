@@ -9,11 +9,6 @@ namespace FarmToTablePublisher.Data
         protected override string EventName => "Moisture Reading";
         #endregion
 
-        #region Constructor
-        public MoistureReadingHistoryChangeProducerClient(string connectionString, string eventHubConnectionString, string eventHubName)
-            : base(connectionString, eventHubConnectionString, eventHubName) { }
-        #endregion
-
         #region Methods
         protected override Task<IEnumerable<MoistureReadingHistoryChange>> GetCdcChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {

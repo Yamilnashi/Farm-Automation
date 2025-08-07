@@ -9,12 +9,6 @@ namespace FarmToTablePublisher.Data
         protected override string EventName => "Temperature Reading";
         #endregion
 
-        #region Constructor
-        public TemperatureReadingHistoryChangeProducerClient(string connectionString,
-            string eventHubConnectionString, string eventHubName)
-            : base(connectionString, eventHubConnectionString, eventHubName) { }
-        #endregion
-
         #region Methods
         protected override Task<IEnumerable<TemperatureReadingHistoryChange>> GetCdcChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {

@@ -9,11 +9,6 @@ namespace FarmToTablePublisher.Data
         protected override string EventName => "Sentinel Status History";
         #endregion
 
-        #region Constructor
-        public SentinelStatusHistoryChangeProducerClient(string connectionString, string eventHubConnectionString, string eventHubName)
-            : base(connectionString, eventHubConnectionString, eventHubName) { }
-        #endregion
-
         #region Methods
         protected override Task<IEnumerable<SentinelStatusHistoryChange>> GetCdcChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {

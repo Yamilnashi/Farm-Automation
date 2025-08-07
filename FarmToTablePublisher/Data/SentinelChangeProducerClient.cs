@@ -8,11 +8,6 @@ namespace FarmToTablePublisher.Data
         protected override string TableName => "dbo_Sentinel";
         protected override string EventName => "Sentinel Changes";
         #endregion
-        #region Constructor
-        public SentinelChangeProducerClient(string connectionString,
-            string eventHubConnectionString, string eventHubName)
-            : base(connectionString, eventHubConnectionString, eventHubName) { }
-        #endregion
 
         #region Methods
         protected override Task<IEnumerable<SentinelChange>> GetCdcChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)

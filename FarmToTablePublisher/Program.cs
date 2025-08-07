@@ -8,10 +8,10 @@ namespace FarmToTablePublisher
     internal class Program
     {
         #region Fields
-        private const int _cdcPollingIntervalSeconds = 5; // every 5 seconds, we don't want to hammer the db
-        private static string dbConnectionString = string.Empty;
-        private static string eventHubConnectionString = string.Empty;
-        private static string eventHubName = string.Empty;
+        private const int _cdcPollingIntervalSeconds = 1; // every 1 second, we don't want to hammer the db
+        public static string DbConnectionString = string.Empty;
+        public static string EventHubConnectionString = string.Empty;
+        public static string EventHubName = string.Empty;
         #endregion
 
         #region Main
@@ -23,22 +23,22 @@ namespace FarmToTablePublisher
 
             IConfigurationRoot config = _!;
 
-            (dbConnectionString, eventHubConnectionString, eventHubName) = await BuildResourceConnections(config);
+            (DbConnectionString, EventHubConnectionString, EventHubName) = await BuildResourceConnections(config);
 
             // poll CDC tables and publish loop
             while (true)
             {
                 List<Task> tasks = new List<Task>()
                 {
-                    SentinelChangeTask(),
-                    SentinelStatusHistoryChangeTask(),
-                    TemperatureReadingHistoryChangeTask(),
-                    MoistureReadingHistoryChangeTask(),
-                    SoilReadingHistoryChangeTask()
+                    CreatePublishTask(() => new SentinelChangeProducerClient()),
+                    CreatePublishTask(() => new SentinelStatusHistoryChangeProducerClient()),
+                    CreatePublishTask(() => new TemperatureReadingHistoryChangeProducerClient()),
+                    CreatePublishTask(() => new MoistureReadingHistoryChangeProducerClient()),
+                    CreatePublishTask(() => new SoilReadingHistoryChangeProducerClient())
                 };
 
                 await Task.WhenAll(tasks);
-                await Task.Delay(100 * _cdcPollingIntervalSeconds);
+                await Task.Delay(1000 * _cdcPollingIntervalSeconds);
             }
         }
         #endregion
@@ -76,62 +76,17 @@ namespace FarmToTablePublisher
 
             return (dbConnString, eventHubConnString, eventHub);
         }
-        private static Task SentinelChangeTask()
+        private static Task CreatePublishTask<T>(Func<ProducerClientBase<T>> clientFactory) 
+            where T : ChangeBase
         {
             return Task.Run(async () =>
             {
-                await using (ProducerClientBase<SentinelChange> client = await new SentinelChangeProducerClient(dbConnectionString, 
-                    eventHubConnectionString, 
-                    eventHubName).Initialize())
+                await using (ProducerClientBase<T> client = await clientFactory().Initialize())
                 {
                     await client.PublishChanges();
                 }
             });
-        }
-        private static Task SentinelStatusHistoryChangeTask()
-        {
-            return Task.Run(async () =>
-            {
-                await using (ProducerClientBase<SentinelStatusHistoryChange> client = await new SentinelStatusHistoryChangeProducerClient(dbConnectionString,
-                    eventHubConnectionString, eventHubName).Initialize())
-                {
-                    await client.PublishChanges();
-                }
-            });
-        }
-        private static Task TemperatureReadingHistoryChangeTask()
-        {
-            return Task.Run(async () =>
-            {
-                await using (ProducerClientBase<TemperatureReadingHistoryChange> client = await new TemperatureReadingHistoryChangeProducerClient(dbConnectionString,
-                    eventHubConnectionString, eventHubName).Initialize())
-                {
-                    await client.PublishChanges();
-                }
-            });
-        }
-        private static Task MoistureReadingHistoryChangeTask()
-        {
-            return Task.Run(async () =>
-            {
-                await using (ProducerClientBase<MoistureReadingHistoryChange> client = await new MoistureReadingHistoryChangeProducerClient(dbConnectionString,
-                    eventHubConnectionString, eventHubName).Initialize())
-                {
-                    await client.PublishChanges();
-                }
-            });
-        }
-        private static Task SoilReadingHistoryChangeTask()
-        {
-            return Task.Run(async () =>
-            {
-                await using (ProducerClientBase<SoilReadingHistoryChange> client = await new SoilReadingHistoryChangeProducerClient(dbConnectionString,
-                    eventHubConnectionString, eventHubName).Initialize())
-                {
-                    await client.PublishChanges();
-                }
-            });
-        }
+        }        
         #endregion
     }
 }

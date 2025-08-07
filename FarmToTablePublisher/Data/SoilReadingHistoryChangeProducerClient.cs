@@ -9,11 +9,6 @@ namespace FarmToTablePublisher.Data
         protected override string EventName => "Soil Reading";
         #endregion
 
-        #region Constructor
-        public SoilReadingHistoryChangeProducerClient(string connectionString, string eventHubConnectionString, string eventHubName)
-            : base(connectionString, eventHubConnectionString, eventHubName) { }
-        #endregion
-
         #region Methods
         protected override Task<IEnumerable<SoilReadingHistoryChange>> GetCdcChangeList(byte[] fromLogSequenceNumber, byte[] toLogSequenceNumber)
         {
