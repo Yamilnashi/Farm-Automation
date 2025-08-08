@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="View" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the output of this view and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Get the analysis records in the system
+
+]]></Comments>
+  <!-- Define the column(s) to return from this view. -->
+  <Table>
+    <!--<Column Name="MyColumn" Comments="" />-->
+  </Table>
+  <Code><![CDATA[
+
+select
+  AnalysisId
+  ,SentinelId
+  ,InstanceId
+  ,IsAnalyzed
+  ,SavedDate
+from
+  [dbo].[Analysis]
+;
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>

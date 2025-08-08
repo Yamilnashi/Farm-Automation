@@ -1,16 +1,101 @@
-﻿<h1>
+﻿@model FarmToTableWebApp.ViewModels.Sentinels.SentinelIndexViewModel
+@{
+    ViewData["Title"] = "Pending Analysis";
+}
+@using FarmToTableData.Models
+<h1>
     Sentinels
 </h1>
 <div class="card card-body">
-    something here
+    <div class="d-flex justify-content-end">
+        <button id="btn-refresh" type="button" class="btn btn-outline-dark btn-sm" style="display: none;">
+            New Pending Analysis
+            <span id="btn-refresh-content" class="badge bg-danger">
+                0
+            </span>
+        </button>
+    </div>    
+    <table id="tbl-analysis" class="table table-striped table-sm w-100 table-hover"></table>
 </div>
 
 @section Scripts {
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.3.2/sr-1.4.1/datatables.min.js" integrity="sha384-SkGZwSVIAmY1xKiIfrxQeVKkcQEXjGXJSVEWbei8/XSsA2WqHjt0bLOEMApY64Pd" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script type="text/javascript">
         'use strict';
         (() => {
+            const connection = new signalR.HubConnectionBuilder().withUrl("/analysisHub").build();      
+            const $tblAnalysis = $('#tbl-analysis');
+            const $btnRefresh = $('#btn-refresh');
+            const $btnRefreshContent = $('#btn-refresh-content');
             const tables = {};
+            const routePrefix = '/Sentinel';
+            const routes = {
+                analysisTableJson: `${routePrefix}/AnalysisTableJson`
+            }
 
+            let analysisCount = 0;
+
+            const analysis = {
+                showHideCounter: () => {
+                    if (analysisCount > 0){
+                        $btnRefresh.show();                        
+                    } else {
+                        $btnRefresh.hide();
+                    }
+                    $btnRefreshContent.text(analysisCount);
+                },
+                loadTable: () => {
+                    if (!tables['analysis']) {
+                        tables['analysis'] = $tblAnalysis
+                            .DataTable({
+                                processing: true,
+                                ajax: {
+                                    url: routes.analysisTableJson
+                                },
+                                columns: @Html.Raw(Model.ColDefs_SentinelsPendingAnalysis),
+                                columnDefs: [
+                                    {
+                                        targets: [0, 1, 2, 3],
+                                        render: function(data, type, row, meta) {
+                                            if (type === 'display'){
+                                                return data;
+                                            }
+                                            return data;
+                                        }
+                                    }
+                                ],
+                                order: [[1, 'asc']]
+                            });
+                    } else {
+                        tables['analysis'].ajax.reload();
+                    }
+                }
+            }
+
+
+            connection
+                .on('ReceiveNewPendingAnalysis', (type, model) => {
+                    analysisCount++;
+                    analysis.showHideCounter();
+                    //toastr.success(`Received new pending analysis with data: ${model}.`);
+                });
+
+            connection.start().then(() => {
+                console.log('signalR started...');
+            }).catch((err) => {
+                return console.error(err.toString());
+            });
+
+            $btnRefresh
+                .on('click', function() {
+                    analysisCount = 0;
+                    analysis.loadTable();
+                    analysis.showHideCounter();
+                });
+
+            analysis.loadTable();
         })();
     </script>
 }

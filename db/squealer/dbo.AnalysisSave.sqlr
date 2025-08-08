@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="StoredProcedure" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Get the analysis Id of an existing instance id for a sentinel or create a new one
+
+]]></Comments>
+  <Parameters>
+    <Parameter Name="AnalysisId" Type="int" Output="True" DefaultValue="" Comments="" />
+    <Parameter Name="InstanceId" Type="varchar(80)" Output="False" DefaultValue="" Comments="" />
+    <Parameter Name="SentinelId" Type="int" Output="False" DefaultValue="" Comments="" />
+    <Parameter Name="SavedDate" Type="datetime2" Output="False" DefaultValue="" Comments="" />
+  </Parameters>
+  <Code><![CDATA[
+
+select
+  @AnalysisId = AnalysisId
+from
+  [dbo].[Analysis]
+where
+  InstanceId = @InstanceId
+  and SentinelId = @SentinelId
+  and IsAnalyzed = 'false'
+;
+
+if @AnalysisId is null
+begin
+  insert
+    [dbo].[Analysis]
+  (
+    SentinelId
+    ,InstanceId
+    ,IsAnalyzed
+    ,SavedDate
+  )
+  values
+  (
+    @SentinelId
+    ,@InstanceId
+    ,'false' -- pending analysis by default
+    ,@SavedDate
+  )
+  set @AnalysisId = scope_identity()
+end
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>

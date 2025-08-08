@@ -1,5 +1,7 @@
 ﻿using FarmToTableData.Models;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using System;
 using System.Net.Http.Json;
 
 namespace FarmToTableSubscribers.Services
@@ -8,6 +10,7 @@ namespace FarmToTableSubscribers.Services
     {
         #region Fields
         private readonly HttpClient _httpClient;
+        private const int _maxRetries = 3;
         #endregion
 
         #region Constructor
@@ -18,19 +21,33 @@ namespace FarmToTableSubscribers.Services
         #endregion
 
         #region Methods
-        public async Task PutPendingAnalysis(string instanceId, int sentinelId, EEventType type, string data)
-        {
+        public async Task PutPendingAnalysis(string instanceId, int sentinelId, EEventType type, DateTime savedDate, string data)
+        {;
             string apiEndpoint = "api/v1/pending-analysis";
             var payload = new PendingAnalysisDTO()
             {
                 InstanceId = instanceId,
                 SentinelId = sentinelId,
                 EventType = type,
+                SavedDate = savedDate,
                 JsonData = data
             };
             string json = JsonConvert.SerializeObject(payload);
-            HttpResponseMessage response = await _httpClient.PutAsJsonAsync(apiEndpoint, json);
-            response.EnsureSuccessStatusCode();
+
+            for (int attempt = 1; attempt <= _maxRetries; attempt++)
+            {
+                try
+                {
+                    Console.WriteLine($"Attempt {attempt}: Fetching {apiEndpoint}");
+                    HttpResponseMessage? response = await _httpClient.PutAsJsonAsync(apiEndpoint, json);
+                    response.EnsureSuccessStatusCode();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}");
+                    await Task.Delay(5000 * attempt); // exponential backoff
+                }
+            }
         }
         #endregion
     }

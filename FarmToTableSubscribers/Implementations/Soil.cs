@@ -1,34 +1,30 @@
-﻿using FarmToTableData.Interfaces;
-using FarmToTableData.Models;
+﻿using FarmToTableData.Models;
 using FarmToTableData.Utils;
 using FarmToTableSubscribers.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace FarmToTableSubscribers.Implementations
 {
-    public class Moisture
+    public class Soil
     {
         #region Fields
         private readonly WebAppClient _httpClient;
         #endregion
 
         #region Constructor
-        public Moisture(WebAppClient httpClient)
+        public Soil(WebAppClient httpClient)
         {
             _httpClient = httpClient;
         }
         #endregion
 
         #region ActivityFunction
-        [Function(nameof(PrepareMoistureAnalysis))]
-        public async Task PrepareMoistureAnalysis(
-            [ActivityTrigger] string input,
-            FunctionContext executionContext)
+        [Function(nameof(PrepareSoilAnalysis))]
+        public async Task PrepareSoilAnalysis([ActivityTrigger] string input, FunctionContext executionContext)
         {
-            ILogger logger = executionContext.GetLogger(nameof(PrepareMoistureAnalysis));
+            ILogger logger = executionContext.GetLogger(nameof(PrepareSoilAnalysis));
             if (string.IsNullOrEmpty(input))
             {
                 logger.LogError("Input or Change is null-check orchestrator call.");
@@ -42,14 +38,14 @@ namespace FarmToTableSubscribers.Implementations
                 return;
             }
 
-            MoistureReadingHistoryChange change = new CdcHelper(activityInput.Change)
-                .GetMoistureReadingHistoryChange();
+            SoilReadingHistoryChange change = new CdcHelper(activityInput.Change)
+                .GetSoilReadingHistoryChange();
             string jsonChange = JsonConvert.SerializeObject(change);
-            logger.LogInformation($"Analyzing Moisture for SentinelId: {change.SentinelId} with InstanceId: {activityInput.InstanceId}...");
+            logger.LogInformation($"Analyzing Soil for SentinelId: {change.SentinelId} with InstanceId: {activityInput.InstanceId}...");
 
             try
             {
-                await _httpClient.PutPendingAnalysis(activityInput.InstanceId, change.SentinelId, EEventType.Moisture, change.SavedDate, jsonChange);
+                await _httpClient.PutPendingAnalysis(activityInput.InstanceId, change.SentinelId, EEventType.Temperature, change.SavedDate, jsonChange);
             }
             catch (Exception ex)
             {

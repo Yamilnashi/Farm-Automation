@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FarmToTableData\FarmToTableData.csproj" />
     <ProjectReference Include="..\KeyVaultAccessLib\KeyVaultAccessLib.csproj" />
   </ItemGroup>

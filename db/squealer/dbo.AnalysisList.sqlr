@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="StoredProcedure" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Get the list of analysis records depending on the InAnalyzed flag
+
+]]></Comments>
+  <Parameters>
+    <Parameter Name="IsAnalyzed" Type="bit" Output="False" DefaultValue="null" Comments="" />
+  </Parameters>
+  <Code><![CDATA[
+
+select
+  AnalysisId
+  ,SentinelId
+  ,InstanceId
+  ,IsAnalyzed
+  ,SavedDate
+from
+  [dbo].[Analysis]
+where
+  @IsAnalyzed is null or IsAnalyzed = @IsAnalyzed
+;
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>

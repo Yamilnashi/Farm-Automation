@@ -29,6 +29,11 @@ namespace FarmToTableData.Implementations
             _connection.Dispose();
         }
 
+        public SqlConnection GetConnection()
+        {
+            return _connection;
+        }
+
         public Task<HistoryState> HistoryStateGet()
         {
             string sql = "[dbo].[HistoryStateGet]";
@@ -181,7 +186,57 @@ namespace FarmToTableData.Implementations
             var values = new { lastLogSequenceNumber };
             return _connection.ExecuteScalarAsync<byte[]>(sql, values, commandType: CommandType.Text);
         }
-        #endregion
 
+        public Task<int> AnalysisSave(int sentinelId, string instanceId, DateTime savedDate)
+        {
+            string sql = "[dbo].[AnalysisSave]";
+            DynamicParameters p = new DynamicParameters();
+            p.Add("@sentinelId", sentinelId);
+            p.Add("@instanceId", instanceId);
+            p.Add("@savedDate", savedDate);
+            p.Add("@AnalysisId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+           
+            return Task.Run(async () =>
+            {
+                await _connection.ExecuteAsync(sql, p, commandType: CommandType.StoredProcedure);
+                return p.Get<int>("AnalysisId");
+            });
+        }
+
+        public Task MoistureAnalysisSave(int analysisId, byte moisture, DateTime savedDate)
+        {
+            string sql = "[dbo].[MoistureAnalysisSave]";
+            var values = new { analysisId, moisture, savedDate };
+            return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
+        }
+
+        public Task TemperatureAnalysisSave(int analysisId, decimal temperatureCelsius, DateTime savedDate)
+        {
+            string sql = "[dbo].[TemperatureAnalysisSave]";
+            var values = new { analysisId, temperatureCelsius, savedDate };
+            return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
+        }
+
+        public Task SoilAnalysisSave(int analysisId, int nPpm, int pPpm, int kPpm, DateTime savedDate)
+        {
+            string sql = "[dbo].[SoilAnalysisSave]";
+            var values = new { analysisId, nPpm, pPpm, kPpm, savedDate };
+            return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
+        }
+
+        public Task SentinelStatusAnalysisSave(int analysisId, int sentinelStatusCode, DateTime savedDate)
+        {
+            string sql = "[dbo].[SentinelStatusAnalysisSave]";
+            var values = new { analysisId, sentinelStatusCode, savedDate };
+            return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
+        }
+
+        public Task<IEnumerable<Analysis>> AnalysisList(bool? isAnalyzed = false)
+        {
+            string sql = "[dbo].[AnalysisList]";
+            var values = new { isAnalyzed };
+            return _connection.QueryAsync<Analysis>(sql, values, commandType: CommandType.StoredProcedure);
+        }
+        #endregion
     }
 }

@@ -31,12 +31,22 @@ where
 ;
 
 
+delete [dbo].[SoilAnalysis];
+delete [dbo].[TemperatureAnalysis];
+delete [dbo].[MoistureAnalysis];
+delete [dbo].[SentinelStatusAnalysis];
+delete [dbo].[Analysis];
 delete [dbo].[TemperatureReadingHistory];
 delete [dbo].[MoistureReadingHistory];
 delete [dbo].[SoilReadingHistory];
 delete [dbo].[SentinelStatusHistory];
 delete [dbo].[Sentinel];
 
+dbcc checkident ('SoilAnalysis', reseed, 0);
+dbcc checkident ('TemperatureAnalysis', reseed, 0);
+dbcc checkident ('MoistureAnalysis', reseed, 0);
+dbcc checkident ('SentinelStatusAnalysis', reseed, 0);
+dbcc checkident ('Analysis', reseed, 0);
 dbcc checkident ('TemperatureReadingHistory', reseed, 0);
 dbcc checkident ('MoistureReadingHistory', reseed, 0);
 dbcc checkident ('SoilReadingHistory', reseed, 0);

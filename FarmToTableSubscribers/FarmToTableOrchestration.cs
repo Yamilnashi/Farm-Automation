@@ -1,6 +1,5 @@
 using Azure.Messaging.EventHubs;
 using FarmToTableData.Extensions;
-using FarmToTableData.Interfaces;
 using FarmToTableData.Models;
 using FarmToTableSubscribers.Implementations;
 using Microsoft.Azure.Functions.Worker;
@@ -9,7 +8,6 @@ using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Runtime.InteropServices.ObjectiveC;
 
 namespace FarmToTableSubscribers;
 public static class FarmToTableOrchestration
@@ -29,6 +27,7 @@ public static class FarmToTableOrchestration
         FunctionContext executionContext)
     {
         _logger = executionContext.GetLogger(nameof(EventHubTrigger));
+        await Task.Delay(1000);
         if (_logger != null)
         {
             await ScheduleOrchestrator(client, events);
@@ -48,31 +47,35 @@ public static class FarmToTableOrchestration
             }
         } catch (JsonException ex)
         {
+            _logger!.LogError($"Could not get string value from context in Orchestrator: {ex.Message}");
             return;
         }        
 
         ActivityInput? prepInput = JsonConvert.DeserializeObject<ActivityInput>(activityString);
-
-        if (prepInput != null)
+        if (prepInput != null &&
+            prepInput.EventType != EEventType.Sentinel) // will handle this later
         {
             prepInput.InstanceId = context.InstanceId;
-            List<Task> prepTasks = new List<Task>();
-            string preppedInputJsonString = JsonConvert.SerializeObject(prepInput);
-            if (prepInput.EventType == EEventType.Moisture)
-            {
-                prepTasks.Add(context.CallActivityAsync(nameof(Moisture.PrepareMoistureAnalysis), preppedInputJsonString));
-            }
-
-            await Task.WhenAll(prepTasks);
-
-            if (prepInput.EventType == EEventType.Moisture)
-            {
-                AnalysisResult moistureResult = await context.WaitForExternalEvent<AnalysisResult>(EEventType.Moisture.EventName());
-            }
+            string json = JsonConvert.SerializeObject(prepInput);
+            await GetPrepareAnalysisActivity(prepInput.EventType, json, context);
+            AnalysisResult result = await context.WaitForExternalEvent<AnalysisResult>(prepInput.EventType.EventName());
         }
+        return;
     }
 
     #region Private   
+    private static Task GetPrepareAnalysisActivity(EEventType type, string json, TaskOrchestrationContext context)
+    {
+        return type switch
+        {
+            EEventType.Moisture => context.CallActivityAsync(nameof(Moisture.PrepareMoistureAnalysis), json),
+            EEventType.Temperature => context.CallActivityAsync(nameof(Temperature.PrepareTemperatureAnalysis), json),
+            EEventType.Soil => context.CallActivityAsync(nameof(Soil.PrepareSoilAnalysis), json),
+            EEventType.SentinelStatus => context.CallActivityAsync(nameof(Implementations.SentinelStatus.PrepareSentinelStatusAnalysis), json),
+            _ => throw new NotImplementedException()
+        };
+    }
+
     private static async Task ScheduleOrchestrator(DurableTaskClient client, EventData[] events)
     {
         for (int i = 0; i < events.Length; i++)
@@ -105,9 +108,7 @@ public static class FarmToTableOrchestration
                 };
                 string activityString = JsonConvert.SerializeObject(activity);
                 string? instanceId = await client.ScheduleNewOrchestrationInstanceAsync(nameof(Orchestrator), activityString);
-            }
-
-            
+            }            
         }
     }
     #endregion

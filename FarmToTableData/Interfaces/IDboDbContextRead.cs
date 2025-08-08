@@ -18,6 +18,6 @@ namespace FarmToTableData.Interfaces
         Task<byte[]> CdcMinLogSequenceNumberGet(string tableName);
         Task<byte[]> CdcIncrementLastLogSequenceNumberGet(byte[] lastLogSequenceNumber);
         Task<byte[]> CdcMaxLogSequenceNumberGetPerTable(string tableName);
-
+        Task<IEnumerable<Analysis>> AnalysisList(bool? isAnalyzed = false);
     }
 }

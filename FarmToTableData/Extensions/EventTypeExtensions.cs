@@ -1,5 +1,4 @@
 ﻿using FarmToTableData.Models;
-using Newtonsoft.Json.Linq;
 using System;
 
 namespace FarmToTableData.Extensions
@@ -15,6 +14,8 @@ namespace FarmToTableData.Extensions
                 case EEventType.Soil:
                 case EEventType.Moisture:
                 case EEventType.Pest:
+                case EEventType.SentinelStatus:
+                case EEventType.Sentinel:
                     name = type.ToString();
                     break;
                 default:

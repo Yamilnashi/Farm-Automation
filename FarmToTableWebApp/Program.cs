@@ -1,5 +1,6 @@
 using FarmToTableData.Implementations;
 using FarmToTableData.Interfaces;
+using FarmToTableWebApp.Hubs;
 using KeyVaultAccessLib;
 
 namespace FarmToTableWebApp
@@ -18,6 +19,7 @@ namespace FarmToTableWebApp
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddRazorPages();
+            builder.Services.AddSignalR();
             builder.Services.AddScoped<IDboDbContextWrite>(sp => new DboDbContext(connectionString));
             builder.Services.AddScoped<IDboDbContextRead>(sp => new DboDbContext(connectionString));
             var app = builder.Build();
@@ -35,6 +37,7 @@ namespace FarmToTableWebApp
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}"
             );
+            app.MapHub<AnalysisHub>("/analysisHub");
             await app.RunAsync();
         }
 

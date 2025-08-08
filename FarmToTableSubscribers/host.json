@@ -2,7 +2,9 @@
   "version": "2.0",
   "extensions": {
     "durableTask": {
-      "hubName": "FarmToTableHub"
+      "hubName": "FarmToTableHub",
+      "maxConcurrentActivityFunctions": 5,
+      "maxConcurrentOrchestratorFunctions": 5
     }
   },
     "logging": {

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Data.SqlClient;
+using System;
+using System.Threading.Tasks;
 
 namespace FarmToTableData.Interfaces
 {
@@ -15,6 +17,11 @@ namespace FarmToTableData.Interfaces
         Task<int> SoilReadingHistoryAdd(int sentinelId, int nPpm, int pPpm, int kPpm);
         Task ResetSentinel();
         Task<int> SentinelStatusHistoryAdd(int sentinelId, int sentinelStatusCode);
-            
+        SqlConnection GetConnection();
+        Task<int> AnalysisSave(int sentinelId, string instanceId, DateTime savedDate);
+        Task MoistureAnalysisSave(int analysisId, byte moisture, DateTime savedDate);
+        Task TemperatureAnalysisSave(int analysisId, decimal temperatureCelsius, DateTime savedDate);
+        Task SoilAnalysisSave(int analysisId, int nPpm, int pPpm, int kPpm, DateTime savedDate);
+        Task SentinelStatusAnalysisSave(int analysisId, int sentinelStatusCode, DateTime savedDate);
     }
 }

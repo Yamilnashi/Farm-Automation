@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="StoredProcedure" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Insert a new temperature analysis record
+
+]]></Comments>
+  <Parameters>
+    <Parameter Name="AnalysisId" Type="int" Output="False" DefaultValue="" Comments="" />
+    <Parameter Name="TemperatureCelsius" Type="decimal(3,1)" Output="False" DefaultValue="" Comments="" />
+    <Parameter Name="SavedDate" Type="datetime2" Output="False" DefaultValue="" Comments="" />
+  </Parameters>
+  <Code><![CDATA[
+
+if not exists (
+  select
+    1
+  from
+    [dbo].[TemperatureAnalysis]
+  where
+    AnalysisId = @AnalysisId
+)
+begin
+  insert
+    [dbo].[TemperatureAnalysis]
+  (
+    AnalysisId
+    ,TemperatureCelsius
+    ,SavedDate
+  )
+  values
+  (
+    @AnalysisId
+    ,@TemperatureCelsius
+    ,@SavedDate
+  )
+end
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>

@@ -54,7 +54,6 @@ namespace FarmToTablePublisher.Data
             byte[]? maxLogSequenceNumber = await GetCdcMaxLogSequenceNumberPerTable();
             if (maxLogSequenceNumber == null)
             {
-                Console.WriteLine($"{EventName}: There haven't been any changes at all.");
                 return; // no changes ever in db
             }
 
@@ -65,7 +64,6 @@ namespace FarmToTablePublisher.Data
             if (fromLogSequenceNumber == null ||
                 CompareLogSequenceNumbers(fromLogSequenceNumber, maxLogSequenceNumber) >= 0)
             {
-                //Console.WriteLine($"{EventName}: Published 0 events.  No new changes.");
                 return; // no new changes
             }
 
