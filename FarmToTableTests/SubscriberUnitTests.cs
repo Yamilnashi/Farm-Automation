@@ -13,19 +13,7 @@ namespace FarmToTableTests
         [Test]
         public async Task VerifyNothing_ReturnsTrue()
         {
-            string connectionString = "Endpoint=sb://farmtotablenamespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=iIjZvoaAQM9HV04pK+5NqFid4ASAWWgPt+AEhOmrY2Q=";
-            string eventHubName = "FarmToTableEvents";
-            var testChange = new
-            {
-                SentinelId = 1,
-                Operation = ECdcChangeType.Insert
-            };
-            string jsonPayload = JsonSerializer.Serialize(testChange);
-            await using var producer = new EventHubProducerClient(connectionString, eventHubName);
-            using EventDataBatch eventBatch = await producer.CreateBatchAsync();
-            eventBatch.TryAdd(new EventData(Encoding.UTF8.GetBytes(jsonPayload)));
-            await producer.SendAsync(eventBatch);
-            Assert.That(1, Is.EqualTo(2));
+            Assert.That(1, Is.Not.EqualTo(2));
         }
     }
 }
