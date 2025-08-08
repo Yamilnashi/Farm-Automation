@@ -1,9 +1,16 @@
-﻿namespace FarmToTableData.Models
+﻿using FarmToTableData.Interfaces;
+using System;
+
+namespace FarmToTableData.Models
 {
-    public class MoistureReadingHistoryChange : HistoryChangeBase
+    public class MoistureReadingHistoryChange : IChangeBase
     {
-        private int MoistureReadingHistoryId { get; set; }
+        public EEventType EventType { get { return EEventType.Moisture; } }
+        public int MoistureReadingHistoryId { get; set; }
         public byte Moisture { get; set; }
-        public override int HistoryId => MoistureReadingHistoryId;
+        public ECdcChangeType Operation { get; set; }
+        public int SentinelId { get; set; }
+        public DateTime SavedDate { get; set; }
+        public MoistureReadingHistoryChange() { }
     }
 }

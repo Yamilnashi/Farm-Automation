@@ -1,9 +1,16 @@
-﻿namespace FarmToTableData.Models
+﻿using FarmToTableData.Interfaces;
+using System;
+
+namespace FarmToTableData.Models
 {
-    public class SentinelStatusHistoryChange : HistoryChangeBase
+    public class SentinelStatusHistoryChange : IChangeBase
     {
+        public EEventType EventType { get { return EEventType.SentinelStatus; } }
+        public ECdcChangeType Operation { get; set; }
+        public int SentinelId { get; set; }
+        public DateTime SavedDate { get; set; }
         public ESentinelStatus SentinelStatusCode { get; set; }
-        private int SentinelStatusHistoryId { get; set; }
-        public override int HistoryId => SentinelStatusHistoryId;
+        public int SentinelStatusHistoryId { get; set; }
+        public SentinelStatusHistoryChange() { }
     }
 }

@@ -3,10 +3,11 @@ using Azure.Messaging.EventHubs.Producer;
 using FarmToTableData.Implementations;
 using FarmToTableData.Models;
 using System.Text.Json;
+using FarmToTableData.Interfaces;
 
 namespace FarmToTablePublisher.Data
 {
-    public abstract class ProducerClientBase<T> : IAsyncDisposable where T : ChangeBase
+    public abstract class ProducerClientBase<T> : IAsyncDisposable where T : class, IChangeBase
     {
         #region Fields
         protected abstract string TableName { get; }
@@ -34,31 +35,6 @@ namespace FarmToTablePublisher.Data
         #endregion
 
         #region Methods
-        public void PrintChangeStatistics(T[] changes)
-        {
-            int deleteCount = 0;
-            int insertCount = 0;
-            int updateCount = 0;
-            for (int i = 0; i < changes.Length; i++)
-            {
-                if (changes[i].Operation == ECdcChangeType.Delete)
-                {
-                    deleteCount++;
-                }
-                else if (changes[i].Operation == ECdcChangeType.Insert)
-                {
-                    insertCount++;
-                }
-                else if (changes[i].Operation == ECdcChangeType.UpdateAfter)
-                {
-                    updateCount++;
-                } else
-                {
-                    Console.WriteLine($"Unknown Operation: {changes[i]}");
-                }
-            }
-            
-        }
         public Task<byte[]?> GetCdcMaxLogSequenceNumberPerTable()
         {
             return _dbContext.CdcMaxLogSequenceNumberGetPerTable(TableName);

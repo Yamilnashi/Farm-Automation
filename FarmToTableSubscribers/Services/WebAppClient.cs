@@ -1,4 +1,5 @@
 ﻿using FarmToTableData.Models;
+using Newtonsoft.Json;
 using System.Net.Http.Json;
 
 namespace FarmToTableSubscribers.Services
@@ -17,17 +18,18 @@ namespace FarmToTableSubscribers.Services
         #endregion
 
         #region Methods
-        public async Task SavePendingAnalysis(string instanceId, int sentinelId, EEventType type)
+        public async Task PutPendingAnalysis(string instanceId, int sentinelId, EEventType type, string data)
         {
             string apiEndpoint = "api/v1/pending-analysis";
-            var payload = new
+            var payload = new PendingAnalysisDTO()
             {
                 InstanceId = instanceId,
                 SentinelId = sentinelId,
-                Type = type
+                EventType = type,
+                JsonData = data
             };
-
-            HttpResponseMessage response = await _httpClient.PutAsJsonAsync(apiEndpoint, payload);
+            string json = JsonConvert.SerializeObject(payload);
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync(apiEndpoint, json);
             response.EnsureSuccessStatusCode();
         }
         #endregion

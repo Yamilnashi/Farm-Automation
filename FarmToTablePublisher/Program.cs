@@ -1,4 +1,5 @@
-﻿using FarmToTableData.Models;
+﻿using FarmToTableData.Interfaces;
+using FarmToTableData.Models;
 using FarmToTablePublisher.Data;
 using KeyVaultAccessLib;
 using Microsoft.Extensions.Configuration;
@@ -77,7 +78,7 @@ namespace FarmToTablePublisher
             return (dbConnString, eventHubConnString, eventHub);
         }
         private static Task CreatePublishTask<T>(Func<ProducerClientBase<T>> clientFactory) 
-            where T : ChangeBase
+            where T : class, IChangeBase
         {
             return Task.Run(async () =>
             {

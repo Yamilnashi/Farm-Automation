@@ -14,7 +14,7 @@ var host = new HostBuilder()
         services.AddDurableTaskClient();
         services.AddHttpClient<WebAppClient>(client =>
         {
-            client.BaseAddress = new Uri("https://someapp.azure.net/");            
+            client.BaseAddress = new Uri("https://localhost:7236/");            
         });
     })
     .Build();

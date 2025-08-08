@@ -1,9 +1,16 @@
-﻿namespace FarmToTableData.Models
+﻿using FarmToTableData.Interfaces;
+using System;
+
+namespace FarmToTableData.Models
 {
-    public class TemperatureReadingHistoryChange : HistoryChangeBase
+    public class TemperatureReadingHistoryChange : IChangeBase
     {
-        private int TemperatureReadingHistoryId { get; set; }
+        public int TemperatureReadingHistoryId { get; set; }
         public decimal TemperatureCelsius { get; set; }
-        public override int HistoryId => TemperatureReadingHistoryId;
+        public EEventType EventType { get { return EEventType.Temperature; } }
+        public ECdcChangeType Operation { get; set; }
+        public int SentinelId { get; set; }
+        public DateTime SavedDate { get; set; }
+        public TemperatureReadingHistoryChange() {}
     }
 }

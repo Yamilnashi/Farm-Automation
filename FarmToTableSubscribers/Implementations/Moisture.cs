@@ -1,29 +1,60 @@
-﻿using FarmToTableData.Models;
+﻿using FarmToTableData.Interfaces;
+using FarmToTableData.Models;
+using FarmToTableData.Utils;
 using FarmToTableSubscribers.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FarmToTableSubscribers.Implementations
 {
-    public static class Moisture
+    public class Moisture
     {
-        [Function(nameof(PrepareMoistureAnalysis))]
-        public static async Task PrepareMoistureAnalysis([ActivityTrigger] FunctionContext executionContext, dynamic input, WebAppClient webAppClient)
-        {
-            ChangeBase change = input.Change;
-            string instanceId = input.InstanceId;
+        #region Fields
+        private readonly WebAppClient _httpClient;
+        #endregion
 
+        #region Constructor
+        public Moisture(WebAppClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+        #endregion
+
+        #region ActivityFunction
+        [Function(nameof(PrepareMoistureAnalysis))]
+        public async Task PrepareMoistureAnalysis(
+            [ActivityTrigger] string input,
+            FunctionContext executionContext)
+        {
             ILogger logger = executionContext.GetLogger(nameof(PrepareMoistureAnalysis));
-            logger.LogInformation($"Analyzing Moisture for SentinelId: {change.SentinelId} with InstanceId: {instanceId}...");
+            if (string.IsNullOrEmpty(input))
+            {
+                logger.LogError("Input or Change is null-check orchestrator call.");
+                return;
+            }
+
+            ActivityInput? activityInput = JsonConvert.DeserializeObject<ActivityInput>(input);
+            if (activityInput == null)
+            {
+                logger.LogError($"Input had value but deserializing into ActivityInput failed.");
+                return;
+            }
+
+            MoistureReadingHistoryChange change = CdcHelper.GetMoistureReadingHistoryChange(activityInput.Change);
+            logger.LogInformation($"Analyzing Moisture for SentinelId: {change.SentinelId} with InstanceId: {activityInput.InstanceId}...");
 
             try
             {
-                await webAppClient.SavePendingAnalysis(instanceId, change.SentinelId, EEventType.Moisture);
-            } catch (Exception ex)
+                await _httpClient.PutPendingAnalysis(activityInput.InstanceId, change.SentinelId, EEventType.Moisture, input);
+            }
+            catch (Exception ex)
             {
                 logger.LogError($"Web app save failed: {ex.Message}.");
                 throw; // durable function retries
             }
         }
+        #endregion
     }
 }

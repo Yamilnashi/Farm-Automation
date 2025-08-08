@@ -1,17 +1,14 @@
-using Azure.Messaging.EventHubs;
+﻿using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Producer;
 using FarmToTableData.Models;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace FarmToTableTests
+namespace FarmToTableFieldOps
 {
-    [TestFixture]
-    public class Tests
+    internal class Program
     {
-        [Test]
-        public async Task VerifyNothing_ReturnsTrue()
+        static async Task Main(string[] args)
         {
             string connectionString = "Endpoint=sb://farmtotablenamespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=iIjZvoaAQM9HV04pK+5NqFid4ASAWWgPt+AEhOmrY2Q=";
             string eventHubName = "FarmToTableEvents";
@@ -25,7 +22,7 @@ namespace FarmToTableTests
             using EventDataBatch eventBatch = await producer.CreateBatchAsync();
             eventBatch.TryAdd(new EventData(Encoding.UTF8.GetBytes(jsonPayload)));
             await producer.SendAsync(eventBatch);
-            Assert.That(1, Is.EqualTo(2));
+            Console.WriteLine("Test event sent—check Function logs/breakpoints.");
         }
     }
 }
