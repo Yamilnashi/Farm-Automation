@@ -20,13 +20,35 @@ Get the analysis records in the system
   <Code><![CDATA[
 
 select
-  AnalysisId
-  ,SentinelId
-  ,InstanceId
-  ,IsAnalyzed
-  ,SavedDate
+  a.AnalysisId
+  ,a.SentinelId
+  ,a.InstanceId
+  ,s.SoilAnalysisId
+  ,t.TemperatureAnalysisId
+  ,m.MoistureAnalysisId
+  ,ss.SentinelStatusAnalysisId
+  ,s.NPpm
+  ,s.PPpm
+  ,s.KPpm
+  ,a.IsAnalyzed
+  ,t.TemperatureCelsius
+  ,m.Moisture
+  ,ss.SentinelStatusCode
+  ,a.SavedDate  
 from
-  [dbo].[Analysis]
+  [dbo].[Analysis] a
+left join
+  [dbo].[SoilAnalysis] s
+  on s.AnalysisId = a.AnalysisId
+left join
+  [dbo].[TemperatureAnalysis] t
+  on t.AnalysisId = a.AnalysisId
+left join
+  [dbo].[MoistureAnalysis] m
+  on m.AnalysisId = a.AnalysisId
+left join
+  [dbo].[SentinelStatusAnalysis] ss
+  on ss.AnalysisId = a.AnalysisId
 ;
 
 ]]></Code>

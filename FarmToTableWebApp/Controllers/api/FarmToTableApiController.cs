@@ -3,9 +3,7 @@ using FarmToTableData.Models;
 using FarmToTableWebApp.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
-using System.Transactions;
 
 namespace FarmToTableWebApp.Controllers.api
 {

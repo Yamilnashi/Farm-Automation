@@ -22,10 +22,20 @@ select
   AnalysisId
   ,SentinelId
   ,InstanceId
+  ,SoilAnalysisId
+  ,TemperatureAnalysisId
+  ,MoistureAnalysisId
+  ,SentinelStatusAnalysisId
+  ,NPpm
+  ,PPpm
+  ,KPpm  
   ,IsAnalyzed
+  ,TemperatureCelsius
+  ,Moisture
+  ,SentinelStatusCode
   ,SavedDate
 from
-  [dbo].[Analysis]
+  [dbo].[Analyses]
 where
   @IsAnalyzed is null or IsAnalyzed = @IsAnalyzed
 ;

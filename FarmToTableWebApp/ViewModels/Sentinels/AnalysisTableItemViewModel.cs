@@ -1,4 +1,5 @@
-﻿using FarmToTableWebApp.Data;
+﻿using FarmToTableData.Interfaces;
+using FarmToTableWebApp.Data;
 
 namespace FarmToTableWebApp.ViewModels.Sentinels
 {

@@ -5,7 +5,7 @@
 /* Project name:          farm-to-table                                   */
 /* Author:                Yamil Font                                      */
 /* Script type:           Database creation script                        */
-/* Created on:            2025-08-08 09:47                                */
+/* Created on:            2025-08-08 16:25                                */
 /* ---------------------------------------------------------------------- */
 
 
@@ -164,11 +164,11 @@ GO
 
 
 CREATE TABLE [dbo].[SentinelStatusAnalysis] (
-    [SentinelStatusAnalysis] INTEGER IDENTITY(1,1) NOT NULL,
+    [SentinelStatusAnalysisId] INTEGER IDENTITY(1,1) NOT NULL,
     [AnalysisId] INTEGER,
     [SentinelStatusCode] INTEGER,
     [SavedDate] DATETIME2 CONSTRAINT [DEF_SentinelStatusAnalysis_SavedDate] DEFAULT sysdatetime() NOT NULL,
-    CONSTRAINT [PK_SentinelStatusAnalysis] PRIMARY KEY ([SentinelStatusAnalysis])
+    CONSTRAINT [PK_SentinelStatusAnalysis] PRIMARY KEY ([SentinelStatusAnalysisId])
 )
 GO
 

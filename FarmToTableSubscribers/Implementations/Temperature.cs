@@ -46,7 +46,7 @@ namespace FarmToTableSubscribers.Implementations
 
             try
             {
-                await _httpClient.PutPendingAnalysis(activityInput.InstanceId, change.SentinelId, EEventType.Temperature, change.SavedDate, jsonChange);
+                await _httpClient.PutPendingAnalysis(activityInput.InstanceId, change.SentinelId, change.EventType, change.SavedDate, jsonChange);
             }
             catch (Exception ex)
             {

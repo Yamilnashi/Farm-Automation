@@ -3,6 +3,7 @@ using FarmToTableData.Models;
 using FarmToTableWebApp.ViewModels.Sentinels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using FarmToTableData.Extensions;
 
 namespace FarmToTableWebApp.Controllers
 {
@@ -43,14 +44,23 @@ namespace FarmToTableWebApp.Controllers
             try
             {
                 IEnumerable<Analysis> analysis = await _dbContextRead.AnalysisList();
-                IEnumerable<AnalysisTableItemViewModel> models = analysis
-                    .Select(x => new AnalysisTableItemViewModel()
+
+                Dictionary<int, Analysis> analysisDict = analysis
+                    .GroupBy(x => x.SentinelId)
+                    .ToDictionary(x => x.Key, x => x.First());
+                Dictionary<int, Dictionary<string, object>> analysisDataDicts = analysis
+                    .GroupBy(x => x.SentinelId)
+                    .ToDictionary(x => x.Key, x => GetAnalysisDataDicts(x.ToArray()));
+
+                IEnumerable<AnalysisTableItemViewModel> models = analysisDict.Keys
+                    .Select(sentinelId => new AnalysisTableItemViewModel()
                     {
-                        AnalysisId = x.AnalysisId,
-                        InstanceId = x.InstanceId,
-                        SentinelId = x.SentinelId,
-                        IsAnalyzed = x.IsAnalyzed,
-                        SavedDate = x.SavedDate,
+                        AnalysisId = analysisDict[sentinelId].AnalysisId,
+                        InstanceId = analysisDict[sentinelId].InstanceId,
+                        SentinelId = sentinelId,
+                        IsAnalyzed = analysisDict[sentinelId].IsAnalyzed,
+                        SavedDate = analysisDict[sentinelId].SavedDate,
+                        AnalysisDataDict = analysisDataDicts[sentinelId]
                     });
                 json = JsonConvert.SerializeObject(new { data = models });
             } catch (Exception ex)
@@ -60,6 +70,20 @@ namespace FarmToTableWebApp.Controllers
             return Content(json, "application/json");
         }
 
+        #endregion
+
+        #region Private
+        private Dictionary<string, object> GetAnalysisDataDicts(Analysis[] analyses)
+        {
+            Dictionary<string, object> dicts = new Dictionary<string, object>();            
+            for (int i = 0; i < analyses.Length; i++)
+            {
+                Analysis a = analyses[i];
+                object obj = a.GetAnalysisChangeType();
+                dicts.TryAdd(a.InstanceId, obj);
+            }
+            return dicts;
+        }
         #endregion
     }
 }
