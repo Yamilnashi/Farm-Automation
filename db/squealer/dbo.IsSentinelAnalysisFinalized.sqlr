@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
+<Squealer Type="ScalarFunction" Flags="" WithOptions="">
+  <!-- Optional T-SQL to execute before the main object is created. -->
+  <PreCode><![CDATA[
+
+
+
+]]></PreCode>
+  <!-- Describe the output of this scalar function and any difficult concepts. -->
+  <Comments><![CDATA[
+
+Return true if there are no more analysis attempts
+
+]]></Comments>
+  <Parameters>
+    <Parameter Name="SentinelId" Type="int" DefaultValue="" Comments="" />
+  </Parameters>
+  <!-- Define the data type For @Result, your scalar Return variable. -->
+  <Returns Type="bit" />
+  <Code><![CDATA[
+
+set @Result = 'true';
+
+select
+  @Result = 'false'
+from
+  [dbo].[Analysis]
+where
+  SentinelId = @SentinelId
+  and IsAnalyzed = 'false'
+;
+
+]]></Code>
+  <Users>
+    <User Name="dbSimplot" />
+  </Users>
+  <!-- Optional T-SQL to execute after the main object is created. -->
+  <PostCode><![CDATA[
+
+
+
+]]></PostCode>
+</Squealer>

@@ -20,5 +20,6 @@ namespace FarmToTableData.Interfaces
         Task<byte[]> CdcMaxLogSequenceNumberGetPerTable(string tableName);
         Task<(IEnumerable<AnalysisBase>, IEnumerable<SoilAnalysis>, IEnumerable<MoistureAnalysis>, IEnumerable<TemperatureAnalysis>, IEnumerable<SentinelStatusAnalysis>)> AnalysisList(bool? isAnalyzed = false);
         Task<Analysis> AnalysisGet(int analysisId);
+        Task<bool> IsSentinelAnalysisFinalized(int sentinelId);
     }
 }

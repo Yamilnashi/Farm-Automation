@@ -257,6 +257,12 @@ namespace FarmToTableData.Implementations
             return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
         }
 
+        public Task<bool> IsSentinelAnalysisFinalized(int sentinelId)
+        {
+            string sql = "select [dbo].[IsSentinelAnalysisFinalized](@sentinelId)";
+            var values = new { sentinelId };
+            return _connection.ExecuteScalarAsync<bool>(sql, values, commandType: CommandType.Text);
+        }
         #endregion
     }
 }
