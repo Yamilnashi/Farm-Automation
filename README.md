@@ -4,8 +4,9 @@
 [![Azure](https://img.shields.io/badge/Azure-Event%20Hub-blue)](https://azure.microsoft.com/services/event-hubs/)
 [![Terraform](https://img.shields.io/badge/Terraform-Infrastructure-623CE4)](https://www.terraform.io/)
 [![MonoGame](https://img.shields.io/badge/MonoGame-Simulation-red)](https://monogame.net/)
-[![SQL](https://img.shields.io/badge/SQL-Data%20Storage-007fff)](https://monogame.net/)
-[![Durable Functions](https://img.shields.io/badge/Durable%20Functions-Serverless%20Compute-green)](https://monogame.net/)
+[![SQL](https://img.shields.io/badge/SQL-Data%20Storage-007fff)](https://www.microsoft.com/en-us/sql-server/sql-server-2022)
+[![Durable Functions](https://img.shields.io/badge/Durable%20Functions-Serverless%20Compute-green)](https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview)
+[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-orange)](https://github.com/features/actions)
 
 Welcome to the Monogame Farming Simulator project! This is an event-driven application that simulates a farm where "sentinels" (sensors) are 
 placed to monitor environmental conditions like soil quality, moisture levels, and temperature. The simulator is built using Monogame for the 
