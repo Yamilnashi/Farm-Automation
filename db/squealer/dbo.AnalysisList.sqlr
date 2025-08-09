@@ -10,7 +10,12 @@
   <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
   <Comments><![CDATA[
 
-Get the list of analysis records depending on the InAnalyzed flag
+Gets 4 results sets for each analysis data
+  1. Analysis
+  2. Soil
+  3. Moisture
+  4. Temperature
+  5. Sentinel Status  
 
 ]]></Comments>
   <Parameters>
@@ -19,25 +24,80 @@ Get the list of analysis records depending on the InAnalyzed flag
   <Code><![CDATA[
 
 select
-  AnalysisId
-  ,SentinelId
-  ,InstanceId
-  ,SoilAnalysisId
-  ,TemperatureAnalysisId
-  ,MoistureAnalysisId
-  ,SentinelStatusAnalysisId
-  ,NPpm
-  ,PPpm
-  ,KPpm  
-  ,IsAnalyzed
-  ,TemperatureCelsius
-  ,Moisture
-  ,SentinelStatusCode
-  ,SavedDate
+  a.AnalysisId
+  ,a.SentinelId
+  ,a.IsAnalyzed
+  ,a.SavedDate
 from
-  [dbo].[Analyses]
+  [dbo].[Analysis] a
 where
-  @IsAnalyzed is null or IsAnalyzed = @IsAnalyzed
+  @IsAnalyzed is null or a.IsAnalyzed = @IsAnalyzed
+;
+
+select
+  a.AnalysisId
+  ,a.SentinelId
+  ,a.IsAnalyzed
+  ,s.InstanceId
+  ,s.NPpm
+  ,s.PPpm
+  ,s.KPpm
+  ,a.SavedDate
+from
+  [dbo].[Analysis] a
+left join
+  [dbo].[SoilAnalysis] s
+  on s.AnalysisId = a.AnalysisId
+where
+  @IsAnalyzed is null or a.IsAnalyzed = @IsAnalyzed
+;
+
+select
+  a.AnalysisId
+  ,a.SentinelId
+  ,a.IsAnalyzed
+  ,m.InstanceId
+  ,m.Moisture
+  ,a.SavedDate
+from
+  [dbo].[Analysis] a
+left join
+  [dbo].[MoistureAnalysis] m
+  on m.AnalysisId = a.AnalysisId
+where
+  @IsAnalyzed is null or a.IsAnalyzed = @IsAnalyzed
+;
+
+select
+  a.AnalysisId
+  ,a.SentinelId
+  ,a.IsAnalyzed
+  ,t.InstanceId
+  ,t.TemperatureCelsius
+  ,a.SavedDate
+from
+  [dbo].[Analysis] a
+left join
+  [dbo].[TemperatureAnalysis] t
+  on t.AnalysisId = a.AnalysisId
+where
+  @IsAnalyzed is null or a.IsAnalyzed = @IsAnalyzed
+;
+
+select
+  a.AnalysisId
+  ,a.SentinelId
+  ,a.IsAnalyzed
+  ,ss.InstanceId
+  ,ss.SentinelStatusCode
+  ,a.SavedDate
+from
+  [dbo].[Analysis] a
+left join
+  [dbo].[SentinelStatusAnalysis] ss
+  on ss.AnalysisId = a.AnalysisId
+where
+  @IsAnalyzed is null or a.IsAnalyzed = @IsAnalyzed
 ;
 
 ]]></Code>

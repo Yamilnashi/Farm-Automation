@@ -15,12 +15,16 @@
         rel="stylesheet" 
         integrity="sha384-foaGls7xdzbuUNCVCI2Jdy3ZEwzRgG/KWRkNMAumHqYFPqT+uqPcixWumvp4OGRj" 
         crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" 
+        integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" 
+        crossorigin="anonymous" 
+        referrerpolicy="no-referrer" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">FarmToTableWebApp</a>
+                <a class="navbar-brand" asp-area="" asp-page="/Index">Farming Automation</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -48,21 +52,21 @@
         <div class="container">
             &copy; 2025 - Farming Automation
         </div>
-    </footer>
-    <script src="https://cdn.datatables.net/v/bs5/dt-2.3.2/sr-1.4.1/datatables.min.js" 
-        integrity="sha384-SkGZwSVIAmY1xKiIfrxQeVKkcQEXjGXJSVEWbei8/XSsA2WqHjt0bLOEMApY64Pd" 
-        crossorigin="anonymous" 
-        referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" 
-        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" 
-        crossorigin="anonymous" 
-        referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js" 
-        integrity="sha384-KIix3a0qkeD2RPwPvpkJ+Knc91vkmDI+i2c7phIO+EfV3dpfDXIGSqQjpIaJXlR9" 
-        crossorigin="anonymous" 
-        referrerpolicy="no-referrer"></script>
+    </footer>    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.3.2/sr-1.4.1/datatables.min.js"
+            integrity="sha384-SkGZwSVIAmY1xKiIfrxQeVKkcQEXjGXJSVEWbei8/XSsA2WqHjt0bLOEMApY64Pd"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+            integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"
+            integrity="sha384-KIix3a0qkeD2RPwPvpkJ+Knc91vkmDI+i2c7phIO+EfV3dpfDXIGSqQjpIaJXlR9"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

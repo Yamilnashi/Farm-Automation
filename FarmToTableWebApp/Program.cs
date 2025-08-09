@@ -1,6 +1,7 @@
 using FarmToTableData.Implementations;
 using FarmToTableData.Interfaces;
 using FarmToTableWebApp.Hubs;
+using FarmToTableWebApp.Services;
 using KeyVaultAccessLib;
 
 namespace FarmToTableWebApp
@@ -22,6 +23,10 @@ namespace FarmToTableWebApp
             builder.Services.AddSignalR();
             builder.Services.AddScoped<IDboDbContextWrite>(sp => new DboDbContext(connectionString));
             builder.Services.AddScoped<IDboDbContextRead>(sp => new DboDbContext(connectionString));
+            builder.Services.AddHttpClient<WebAppClient>(api =>
+            {
+                api.BaseAddress = new Uri("http://localhost:7057/api/");
+            });
             var app = builder.Build();
             if (!app.Environment.IsDevelopment())
             {

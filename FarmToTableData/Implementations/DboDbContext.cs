@@ -187,12 +187,11 @@ namespace FarmToTableData.Implementations
             return _connection.ExecuteScalarAsync<byte[]>(sql, values, commandType: CommandType.Text);
         }
 
-        public Task<int> AnalysisSave(int sentinelId, string instanceId, DateTime savedDate)
+        public Task<int> AnalysisSave(int sentinelId, DateTime savedDate)
         {
             string sql = "[dbo].[AnalysisSave]";
             DynamicParameters p = new DynamicParameters();
             p.Add("@sentinelId", sentinelId);
-            p.Add("@instanceId", instanceId);
             p.Add("@savedDate", savedDate);
             p.Add("@AnalysisId", dbType: DbType.Int32, direction: ParameterDirection.Output);
            
@@ -203,40 +202,61 @@ namespace FarmToTableData.Implementations
             });
         }
 
-        public Task MoistureAnalysisSave(int analysisId, byte moisture, DateTime savedDate)
+        public Task MoistureAnalysisSave(int analysisId, string instanceId, byte moisture, DateTime savedDate)
         {
             string sql = "[dbo].[MoistureAnalysisSave]";
-            var values = new { analysisId, moisture, savedDate };
+            var values = new { analysisId, instanceId, moisture, savedDate };
             return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
         }
 
-        public Task TemperatureAnalysisSave(int analysisId, decimal temperatureCelsius, DateTime savedDate)
+        public Task TemperatureAnalysisSave(int analysisId, string instanceId, decimal temperatureCelsius, DateTime savedDate)
         {
             string sql = "[dbo].[TemperatureAnalysisSave]";
-            var values = new { analysisId, temperatureCelsius, savedDate };
+            var values = new { analysisId, instanceId, temperatureCelsius, savedDate };
             return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
         }
 
-        public Task SoilAnalysisSave(int analysisId, int nPpm, int pPpm, int kPpm, DateTime savedDate)
+        public Task SoilAnalysisSave(int analysisId, string instanceId, int nPpm, int pPpm, int kPpm, DateTime savedDate)
         {
             string sql = "[dbo].[SoilAnalysisSave]";
-            var values = new { analysisId, nPpm, pPpm, kPpm, savedDate };
+            var values = new { analysisId, instanceId, nPpm, pPpm, kPpm, savedDate };
             return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
         }
 
-        public Task SentinelStatusAnalysisSave(int analysisId, int sentinelStatusCode, DateTime savedDate)
+        public Task SentinelStatusAnalysisSave(int analysisId, string instanceId, int sentinelStatusCode, DateTime savedDate)
         {
             string sql = "[dbo].[SentinelStatusAnalysisSave]";
-            var values = new { analysisId, sentinelStatusCode, savedDate };
+            var values = new { analysisId, instanceId, sentinelStatusCode, savedDate };
             return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
         }
 
-        public Task<IEnumerable<Analysis>> AnalysisList(bool? isAnalyzed = false)
+        public async Task<(IEnumerable<AnalysisBase>, IEnumerable<SoilAnalysis>, IEnumerable<MoistureAnalysis>, IEnumerable<TemperatureAnalysis>, IEnumerable<SentinelStatusAnalysis>)> AnalysisList(bool? isAnalyzed = false)
         {
             string sql = "[dbo].[AnalysisList]";
             var values = new { isAnalyzed };
-            return _connection.QueryAsync<Analysis>(sql, values, commandType: CommandType.StoredProcedure);
+            SqlMapper.GridReader multi = await _connection.QueryMultipleAsync(sql, values, commandType: CommandType.StoredProcedure);
+            IEnumerable<AnalysisBase> analyses = await multi.ReadAsync<AnalysisBase>();
+            IEnumerable<SoilAnalysis> soils = await multi.ReadAsync<SoilAnalysis>();
+            IEnumerable<MoistureAnalysis> moistures = await multi.ReadAsync<MoistureAnalysis>();
+            IEnumerable<TemperatureAnalysis> temperatures = await multi.ReadAsync<TemperatureAnalysis>();
+            IEnumerable<SentinelStatusAnalysis> statuses = await multi.ReadAsync<SentinelStatusAnalysis>();
+            return (analyses, soils, moistures, temperatures, statuses);
         }
+
+        public Task<Analysis> AnalysisGet(int analysisId)
+        {
+            string sql = "[dbo].[AnalysisGet]";
+            var values = new { analysisId };
+            return _connection.QueryFirstOrDefaultAsync<Analysis>(sql, values, commandType: CommandType.StoredProcedure);
+        }
+
+        public Task AnalysisUpdate(int analysisId)
+        {
+            string sql = "[dbo].[AnalysisUpdate]";
+            var values = new { analysisId };
+            return _connection.ExecuteAsync(sql, values, commandType: CommandType.StoredProcedure);
+        }
+
         #endregion
     }
 }

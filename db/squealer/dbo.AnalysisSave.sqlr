@@ -15,7 +15,6 @@ Get the analysis Id of an existing instance id for a sentinel or create a new on
 ]]></Comments>
   <Parameters>
     <Parameter Name="AnalysisId" Type="int" Output="True" DefaultValue="" Comments="" />
-    <Parameter Name="InstanceId" Type="varchar(80)" Output="False" DefaultValue="" Comments="" />
     <Parameter Name="SentinelId" Type="int" Output="False" DefaultValue="" Comments="" />
     <Parameter Name="SavedDate" Type="datetime2" Output="False" DefaultValue="" Comments="" />
   </Parameters>
@@ -26,8 +25,7 @@ select
 from
   [dbo].[Analysis]
 where
-  InstanceId = @InstanceId
-  and SentinelId = @SentinelId
+  SentinelId = @SentinelId
   and IsAnalyzed = 'false'
 ;
 
@@ -37,14 +35,12 @@ begin
     [dbo].[Analysis]
   (
     SentinelId
-    ,InstanceId
     ,IsAnalyzed
     ,SavedDate
   )
   values
   (
     @SentinelId
-    ,@InstanceId
     ,'false' -- pending analysis by default
     ,@SavedDate
   )

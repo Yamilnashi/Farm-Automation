@@ -11,9 +11,11 @@ namespace FarmToTableTests
     public class Tests
     {
         [Test]
-        public async Task VerifyNothing_ReturnsTrue()
+        public void VerifyNothing_ReturnsTrue()
         {
-            Assert.That(1, Is.Not.EqualTo(2));
+            bool a = true;
+            bool b = false;
+            Assert.That(a, Is.Not.EqualTo(b));
         }
     }
 }

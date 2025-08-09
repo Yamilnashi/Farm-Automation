@@ -15,6 +15,7 @@ Insert a new temperature analysis record
 ]]></Comments>
   <Parameters>
     <Parameter Name="AnalysisId" Type="int" Output="False" DefaultValue="" Comments="" />
+    <Parameter Name="InstanceId" Type="varchar(80)" Output="False" DefaultValue="" Comments="" />
     <Parameter Name="TemperatureCelsius" Type="decimal(3,1)" Output="False" DefaultValue="" Comments="" />
     <Parameter Name="SavedDate" Type="datetime2" Output="False" DefaultValue="" Comments="" />
   </Parameters>
@@ -33,12 +34,14 @@ begin
     [dbo].[TemperatureAnalysis]
   (
     AnalysisId
+    ,InstanceId
     ,TemperatureCelsius
     ,SavedDate
   )
   values
   (
     @AnalysisId
+    ,@InstanceId
     ,@TemperatureCelsius
     ,@SavedDate
   )

@@ -5,7 +5,7 @@
 /* Project name:          farm-to-table                                   */
 /* Author:                Yamil Font                                      */
 /* Script type:           Database creation script                        */
-/* Created on:            2025-08-08 16:25                                */
+/* Created on:            2025-08-08 20:33                                */
 /* ---------------------------------------------------------------------- */
 
 
@@ -79,7 +79,6 @@ GO
 CREATE TABLE [dbo].[Analysis] (
     [AnalysisId] INTEGER IDENTITY(1,1) NOT NULL,
     [SentinelId] INTEGER,
-    [InstanceId] VARCHAR(80) NOT NULL,
     [IsAnalyzed] BIT CONSTRAINT [DEF_Analysis_IsAnalyzed] DEFAULT 'false' NOT NULL,
     [SavedDate] DATETIME2 CONSTRAINT [DEF_Analysis_SavedDate] DEFAULT sysdatetime() NOT NULL,
     CONSTRAINT [PK_Analysis] PRIMARY KEY ([AnalysisId])
@@ -101,6 +100,7 @@ GO
 CREATE TABLE [dbo].[SoilAnalysis] (
     [SoilAnalysisId] INTEGER IDENTITY(1,1) NOT NULL,
     [AnalysisId] INTEGER NOT NULL,
+    [InstanceId] VARCHAR(80) NOT NULL,
     [NPpm] INTEGER,
     [PPpm] INTEGER,
     [KPpm] INTEGER,
@@ -124,6 +124,7 @@ GO
 CREATE TABLE [dbo].[TemperatureAnalysis] (
     [TemperatureAnalysisId] INTEGER IDENTITY(1,1) NOT NULL,
     [AnalysisId] INTEGER NOT NULL,
+    [InstanceId] VARCHAR(80) NOT NULL,
     [TemperatureCelsius] DECIMAL(3,1),
     [SavedDate] DATETIME2 CONSTRAINT [DEF_TemperatureAnalysis_SavedDate] DEFAULT sysdatetime() NOT NULL,
     CONSTRAINT [PK_TemperatureAnalysis] PRIMARY KEY ([TemperatureAnalysisId])
@@ -145,6 +146,7 @@ GO
 CREATE TABLE [dbo].[MoistureAnalysis] (
     [MoistureAnalysisId] INTEGER IDENTITY(1,1) NOT NULL,
     [AnalysisId] INTEGER NOT NULL,
+    [InstanceId] VARCHAR(80) NOT NULL,
     [Moisture] TINYINT,
     [SavedDate] DATETIME2 CONSTRAINT [DEF_MoistureAnalysis_SavedDate] DEFAULT sysdatetime() NOT NULL,
     CONSTRAINT [PK_MoistureAnalysis] PRIMARY KEY ([MoistureAnalysisId])
@@ -167,6 +169,7 @@ CREATE TABLE [dbo].[SentinelStatusAnalysis] (
     [SentinelStatusAnalysisId] INTEGER IDENTITY(1,1) NOT NULL,
     [AnalysisId] INTEGER,
     [SentinelStatusCode] INTEGER,
+    [InstanceId] VARCHAR(80) NOT NULL,
     [SavedDate] DATETIME2 CONSTRAINT [DEF_SentinelStatusAnalysis_SavedDate] DEFAULT sysdatetime() NOT NULL,
     CONSTRAINT [PK_SentinelStatusAnalysis] PRIMARY KEY ([SentinelStatusAnalysisId])
 )

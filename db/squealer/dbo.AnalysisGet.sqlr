@@ -1,40 +1,29 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <!-- Flags example: "x;exclude from project|r;needs refactoring" (recommend single-character flags) -->
-<Squealer Type="View" Flags="" WithOptions="">
+<Squealer Type="StoredProcedure" Flags="" WithOptions="">
   <!-- Optional T-SQL to execute before the main object is created. -->
   <PreCode><![CDATA[
 
 
 
 ]]></PreCode>
-  <!-- Describe the output of this view and any difficult concepts. -->
+  <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
   <Comments><![CDATA[
 
-Get the analysis records in the system
+Get all the instance Ids for the analysis
 
 ]]></Comments>
-  <!-- Define the column(s) to return from this view. -->
-  <Table>
-    <!--<Column Name="MyColumn" Comments="" />-->
-  </Table>
+  <Parameters>
+    <Parameter Name="AnalysisId" Type="int" Output="False" DefaultValue="" Comments="" />
+  </Parameters>
   <Code><![CDATA[
 
 select
-  a.AnalysisId
-  ,a.SentinelId
-  ,a.InstanceId
-  ,s.SoilAnalysisId
-  ,t.TemperatureAnalysisId
-  ,m.MoistureAnalysisId
-  ,ss.SentinelStatusAnalysisId
-  ,s.NPpm
-  ,s.PPpm
-  ,s.KPpm
-  ,a.IsAnalyzed
-  ,t.TemperatureCelsius
-  ,m.Moisture
-  ,ss.SentinelStatusCode
-  ,a.SavedDate  
+  a.SentinelId
+  ,s.InstanceId as [SoilInstanceId]
+  ,t.InstanceId as [TemperatureInstanceId]
+  ,m.InstanceId as [MoistureInstanceId]
+  ,ss.InstanceId as [SentinelStatusInstanceId]
 from
   [dbo].[Analysis] a
 left join
@@ -49,7 +38,8 @@ left join
 left join
   [dbo].[SentinelStatusAnalysis] ss
   on ss.AnalysisId = a.AnalysisId
-;
+where
+  a.AnalysisId = @AnalysisId
 
 ]]></Code>
   <Users>

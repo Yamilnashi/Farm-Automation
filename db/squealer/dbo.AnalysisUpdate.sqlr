@@ -10,42 +10,21 @@
   <!-- Describe the purpose of this procedure, the return values, and any difficult concepts. -->
   <Comments><![CDATA[
 
-Save a moisture analysis record for an analysisId if it doesn't already exist
+Update an analysis record and mark is as analyzed
 
 ]]></Comments>
   <Parameters>
     <Parameter Name="AnalysisId" Type="int" Output="False" DefaultValue="" Comments="" />
-    <Parameter Name="InstanceId" Type="varchar(80)" Output="False" DefaultValue="" Comments="" />
-    <Parameter Name="Moisture" Type="tinyint" Output="False" DefaultValue="" Comments="" />
-    <Parameter Name="SavedDate" Type="datetime2" Output="False" DefaultValue="" Comments="" />
   </Parameters>
   <Code><![CDATA[
 
-if not exists (
-  select
-    1
-  from
-    [dbo].[MoistureAnalysis]
-  where
-    AnalysisId = @AnalysisId
-)
-begin
-  insert
-    [dbo].[MoistureAnalysis]
-  (
-    AnalysisId
-    ,InstanceId
-    ,Moisture
-    ,SavedDate
-  )
-  values
-  (
-    @AnalysisId
-    ,@InstanceId
-    ,@Moisture
-    ,@SavedDate
-  )
-end
+update
+  [dbo].[Analysis]
+set
+  IsAnalyzed = 'true'
+where
+  AnalysisId = @AnalysisId
+;
 
 ]]></Code>
   <Users>

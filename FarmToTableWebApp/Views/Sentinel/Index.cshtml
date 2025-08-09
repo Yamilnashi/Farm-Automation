@@ -3,27 +3,39 @@
     ViewData["Title"] = "Pending Analysis";
 }
 @using FarmToTableData.Models
+
+<style>
+    .bg-brown {
+        background-color: #a55d2a;
+    }
+</style>
+
 <h1>
     Sentinels
 </h1>
-<div class="card card-body">
-    <div class="d-flex justify-content-end">
-        <button id="btn-refresh" type="button" class="btn btn-outline-dark btn-sm" style="display: none;">
-            New Pending Analysis
-            <span id="btn-refresh-content" class="badge bg-danger">
-                0
-            </span>
-        </button>
-    </div>    
-    <table id="tbl-analysis" class="table table-striped table-sm w-100 table-hover"></table>
-</div>
+@using (Html.BeginForm("SubmitAnalysisResult", "Sentinel", FormMethod.Post, new { @id = "frm-analysis" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="card card-body">
+        <div class="d-flex justify-content-end">
+            <button id="btn-refresh" type="button" class="btn btn-outline-dark btn-sm" style="display: none;">
+                New Pending Analysis
+                <span id="btn-refresh-content" class="badge bg-danger">
+                    0
+                </span>
+            </button>
+        </div>
+        <table id="tbl-analysis" class="table table-striped table-sm w-100 table-hover"></table>
+    </div>
+}    
 
 @section Scripts {    
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script type="text/javascript">
         'use strict';
         (() => {
-            const connection = new signalR.HubConnectionBuilder().withUrl("/analysisHub").build();      
+            const connection = new signalR.HubConnectionBuilder().withUrl("/analysisHub").build();
+            const $frm = $('#frm-analysis');
             const $tblAnalysis = $('#tbl-analysis');
             const $btnRefresh = $('#btn-refresh');
             const $btnRefreshContent = $('#btn-refresh-content');
@@ -45,50 +57,82 @@
                     $btnRefreshContent.text(analysisCount);
                 },
                 getTemperatureData: (temp) => {
+                    const fahrenheit = (temp.TemperatureCelsius * 9/5) + 32;
                     return `
-                        <span class='badge bg-warning'>Temperature ${temp.TemperatureCelsius}&deg;C</span>
+                        <span class='badge bg-warning'>
+                            <i class="fa-solid fa-temperature-high" aria-hidden='true'></i>
+                            ${temp.TemperatureCelsius}&deg;C | ${fahrenheit}&deg;F
+                        </span>
                     `;
                 },
                 getMoistureData: (moisture) => {
                     return `
-                        <span class='badge bg-primary'>Moisture ${moisture.Moisture}/10</span>
+                        <span class='badge bg-primary'>
+                            <i class="fa-solid fa-droplet" aria-hidden='true'></i>
+                            ${moisture.Moisture}/10
+                        </span>
                     `;
                 },
                 getSoilData: (soil) => {
                     return `
-                        <span class='badge bg-dark'>Soil (N:${soil.NPpm}, P:${soil.PPpm}, K:${soil.KPpm})</span>
+                        <span class='badge bg-brown'>
+                            <i class="fa-solid fa-water" aria-hidden='true'></i>
+                            (N:${soil.NPpm}) (P:${soil.PPpm}) (K:${soil.KPpm})
+                        </span>
                     `;
                 },
                 getSentinelStatusData: (ssData) => {
-                    const bg = ssData.SentinelStatusCode === @((int)ESentinelStatus.Offline)
+                    const isOffline = ssData.SentinelStatusCode === @((int)ESentinelStatus.Offline);
+                    const bg = isOffline
                         ? 'bg-danger'
                         : 'bg-success';
+                    const text = isOffline
+                        ? 'Offline'
+                        : 'Online';
+
                     return `
-                        <span class='badge ${bg}'>Status ${ssData.SentinelStatusCode}</span>
+                        <span class='badge ${bg}'>
+                            <i class="fa-solid fa-power-off" aria-hidden='true'></i>
+                        </span>
                     `;
                 },
                 getDataRow: (obj) => {
                     const divs = [];
                     $.each(Object.keys(obj), function(index, key) {
                         let fn;
-                        const type = obj[key].EventType;
-                        if (type === @((int)EEventType.Temperature)) {
-                            fn = analysis.getTemperatureData;
-                        } else if (type === @((int)EEventType.Moisture)) {
-                            fn = analysis.getMoistureData;
-                        } else if (type === @((int)EEventType.Soil)) {
-                            fn = analysis.getSoilData;
-                        } else if (type === @((int)EEventType.SentinelStatus)) {
+                        if (key === '@(EEventType.SentinelStatus)') {
                             fn = analysis.getSentinelStatusData;
+                        } else if (key === '@(EEventType.Temperature)') {
+                            fn = analysis.getTemperatureData;
+                        } else if (key === '@(EEventType.Moisture)') {
+                            fn = analysis.getMoistureData;
+                        } else if (key === '@(EEventType.Soil)') {
+                            fn = analysis.getSoilData;
                         }
                         const div = fn(obj[key]);
                         divs.push(div);
                     });
-                    return divs.join('</br>');
+                    return divs.join('');
                 },
                 loadTable: () => {
                     if (!tables['analysis']) {
                         tables['analysis'] = $tblAnalysis
+                            .on('click', 'button.btn-resolve', function(){
+                                const $btn = $(this);
+                                const analysisId = $btn.data('analysisid');
+                                const __requestVerificationToken = $frm.find('input[name="__RequestVerificationToken"]').val();
+                                app.confirm(() => {
+                                    $.post($frm[0].action, { __requestVerificationToken, analysisId }, function(response) {
+                                        analysis.loadTable();
+                                        toastr.success('Analysis confirmed!');
+                                    }).fail(function(xhr, textStatus, error){
+                                        console.error(error);
+                                    });
+                                }, 'Confirm Analysis?',
+                                    'Are you sure you want to confirm the analysis?',
+                                    'Confirm Analysis',
+                                    'Cancel');
+                            })
                             .DataTable({
                                 processing: true,
                                 ajax: {
@@ -97,8 +141,24 @@
                                 columns: @Html.Raw(Model.ColDefs_SentinelsPendingAnalysis),
                                 columnDefs: [
                                     {
-                                        targets: [0, 1, 2],
+                                        targets: [0],
+                                        className: 'text-center align-middle',
                                         render: function(data, type, row, meta) {
+                                            if (type === 'display') {
+                                                return `
+                                                    <button type='button' class='btn btn-success btn-sm btn-resolve'
+                                                        data-analysisid='${row.AnalysisId}'>
+                                                        <i class='fa fa-check' aria-hidden='true'></i>
+                                                    </button>
+                                                `;
+                                            }
+                                            return data;
+                                        }
+                                    },
+                                    {
+                                        targets: [1],
+                                        className: 'text-center align-middle',
+                                        render: function (data, type, row, meta) {
                                             if (type === 'display') {
                                                 return data;
                                             }
@@ -106,17 +166,17 @@
                                         }
                                     },
                                     {
-                                        targets: [3], // saved date
+                                        targets: [2], // saved date
+                                        className: 'text-center align-middle',
                                         render: function(data, type, row, meta) {
                                             if (type === 'display') {
-                                                console.log(data);
                                                 return moment(data).format('M/D/YYYY h:m:s.SSS a');
                                             }
                                             return data;
                                         }
                                     },
                                     {
-                                        targets: [4], // data
+                                        targets: [3], // data
                                         render: function(data, type, row, meta) {
                                             if (type === 'display') {
                                                 return analysis.getDataRow(data);

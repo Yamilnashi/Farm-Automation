@@ -3,6 +3,7 @@ using FarmToTableData.Extensions;
 using FarmToTableData.Models;
 using FarmToTableSubscribers.Implementations;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
@@ -14,10 +15,6 @@ public static class FarmToTableOrchestration
 {
     #region Fields
     private static ILogger? _logger;
-    private static JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings()
-    {
-        TypeNameHandling = TypeNameHandling.Auto
-    };
     #endregion
 
     [Function(nameof(EventHubTrigger))]
@@ -61,6 +58,32 @@ public static class FarmToTableOrchestration
             AnalysisResult result = await context.WaitForExternalEvent<AnalysisResult>(prepInput.EventType.EventName());
         }
         return;
+    }
+
+    [Function(nameof(RaiseAnalysisResult))]
+    public static async Task<HttpResponseData> RaiseAnalysisResult(
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "raise-event/{instanceId}/{eventName}")] HttpRequestData request,
+        string instanceId,
+        string eventName,
+        [DurableClient] DurableTaskClient client,
+        FunctionContext executionContext)
+    {
+        ILogger logger = executionContext.GetLogger(nameof(RaiseAnalysisResult));
+        logger.LogInformation($"Raising event '{eventName}' for instance '{instanceId}'.");
+
+        string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+        AnalysisResult? result = JsonConvert.DeserializeObject<AnalysisResult>(requestBody);
+        if (result == null)
+        {
+            HttpResponseData badResponse = request.CreateResponse(System.Net.HttpStatusCode.BadRequest);
+            await badResponse.WriteStringAsync("Invalid AnalysisResult payload.");
+            return badResponse;
+        }
+
+        await client.RaiseEventAsync(instanceId, eventName, result);
+        HttpResponseData response = request.CreateResponse(System.Net.HttpStatusCode.OK);
+        await response.WriteStringAsync("Eevent raised successfully.");
+        return response;
     }
 
     #region Private   

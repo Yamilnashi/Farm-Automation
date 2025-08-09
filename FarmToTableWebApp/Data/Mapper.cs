@@ -51,7 +51,9 @@ namespace FarmToTableWebApp.Data
             int i;
             for (i = 0; i <= num; i++)
             {
-                DataTableColumnAttribute? item = list.FirstOrDefault((DataTableColumnAttribute x) => x.ColIndexs.Contains(i));
+                DataTableColumnAttribute? item = list
+                    .Where(x => x.ColIndexs != null)
+                    .FirstOrDefault((DataTableColumnAttribute x) => x.ColIndexs!.Contains(i));
                 if (item != null)
                 {
                     list2.Add(item);

@@ -1,4 +1,5 @@
-﻿using FarmToTableData.Interfaces;
+﻿using FarmToTableData.Extensions;
+using FarmToTableData.Interfaces;
 using FarmToTableData.Models;
 using FarmToTableWebApp.Hubs;
 using Microsoft.AspNetCore.Mvc;
@@ -28,58 +29,45 @@ namespace FarmToTableWebApp.Controllers.api
         }
         #endregion
 
+        #region PUT
         [HttpPut]
         [Route("pending-analysis")]
         public async Task<IActionResult> PutPendingResult([FromBody] string dto)
         {
             PendingAnalysisDTO? dtoModel = JsonConvert.DeserializeObject<PendingAnalysisDTO?>(dto);
-            if (dtoModel != null && 
+            if (dtoModel != null &&
                 dtoModel.EventType != EEventType.Sentinel) // not handling these yet
             {
                 await PutModelData(dtoModel);
-            }            
+            }
             return NoContent();
         }
-
-        [HttpGet]
-        [Route("test")]
-        public async Task<IActionResult> Test()
-        {
-            await _hubContext.Clients.All.SendAsync("ReceiveNewPendingAnalysis", EEventType.Moisture, new MoistureReadingHistoryChange()
-            {
-                SentinelId = 1,
-                Operation = ECdcChangeType.Insert,
-                Moisture = (byte)new Random().Next(1, 10),
-                MoistureReadingHistoryId = 1,
-                SavedDate = DateTime.UtcNow
-            });
-            return Ok();
-        }
+        #endregion
 
         #region Private
         private async Task PutModelData(PendingAnalysisDTO dtoModel)
         {
-            int analysisId = await _dbContext.AnalysisSave(dtoModel.SentinelId, dtoModel.InstanceId, dtoModel.SavedDate);
+            int analysisId = await _dbContext.AnalysisSave(dtoModel.SentinelId, dtoModel.SavedDate);
 
             if (dtoModel.EventType == EEventType.Moisture)
             {
                 MoistureReadingHistoryChange model = JsonConvert.DeserializeObject<MoistureReadingHistoryChange>(dtoModel.JsonData)!;
-                await _dbContext.MoistureAnalysisSave(analysisId, model.Moisture, model.SavedDate);
+                await _dbContext.MoistureAnalysisSave(analysisId, dtoModel.InstanceId, model.Moisture, model.SavedDate);
             }
             else if (dtoModel.EventType == EEventType.Temperature)
             {
                 TemperatureReadingHistoryChange model = JsonConvert.DeserializeObject<TemperatureReadingHistoryChange>(dtoModel.JsonData)!;
-                await _dbContext.TemperatureAnalysisSave(analysisId, model.TemperatureCelsius, model.SavedDate);
+                await _dbContext.TemperatureAnalysisSave(analysisId, dtoModel.InstanceId, model.TemperatureCelsius, model.SavedDate);
             }
             else if (dtoModel.EventType == EEventType.Soil)
             {
                 SoilReadingHistoryChange model = JsonConvert.DeserializeObject<SoilReadingHistoryChange>(dtoModel.JsonData)!;
-                await _dbContext.SoilAnalysisSave(analysisId, model.NPpm, model.PPpm, model.KPpm, model.SavedDate);
+                await _dbContext.SoilAnalysisSave(analysisId, dtoModel.InstanceId, model.NPpm, model.PPpm, model.KPpm, model.SavedDate);
             }
             else if (dtoModel.EventType == EEventType.SentinelStatus)
             {
                 SentinelStatusHistoryChange model = JsonConvert.DeserializeObject<SentinelStatusHistoryChange>(dtoModel.JsonData)!;
-                await _dbContext.SentinelStatusAnalysisSave(analysisId, (int)model.SentinelStatusCode, model.SavedDate);
+                await _dbContext.SentinelStatusAnalysisSave(analysisId, dtoModel.InstanceId, (int)model.SentinelStatusCode, model.SavedDate);
             }
 
             await _hubContext.Clients.All.SendAsync("ReceiveNewPendingAnalysis", dtoModel.EventType, dtoModel.JsonData);
